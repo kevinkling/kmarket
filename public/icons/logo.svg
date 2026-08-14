@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="KMarket">
+  <rect width="128" height="128" rx="28" fill="#FBFBFA"/>
+  <rect x="24" y="62" width="48" height="40" rx="10" fill="#EDF3EC"/>
+  <!-- basket body -->
+  <path
+    fill="none"
+    stroke="#111111"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    d="M32 74h64l-7 32H39l-7-32z"
+  />
+  <path fill="none" stroke="#111111" stroke-width="8" stroke-linecap="round" d="M28 74h72"/>
+  <path fill="none" stroke="#111111" stroke-width="7" stroke-linecap="round" d="M52 82v16M76 82v16"/>
+  <!-- letter K -->
+  <path fill="#111111" d="M46 26h15v30l20-30h17L75 56l24 46H82L61 70v32H46V26z"/>
+</svg>

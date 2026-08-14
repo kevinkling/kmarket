@@ -12,7 +12,22 @@ import { ThemeService } from '../../services/theme.service';
   template: `
     <header class="header">
       <div class="header-container">
-        <a routerLink="/" class="brand">
+        <a routerLink="/" class="brand" aria-label="KMarket inicio">
+          <span class="brand-mark" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+              <rect class="brand-accent" x="3" y="19" width="15" height="13" rx="3"/>
+              <path
+                stroke="currentColor"
+                stroke-width="2.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10 23h20l-2.2 11H12.2L10 23z"
+              />
+              <path stroke="currentColor" stroke-width="2.75" stroke-linecap="round" d="M8.5 23h23"/>
+              <path stroke="currentColor" stroke-width="2.25" stroke-linecap="round" d="M16.5 25.5v6M23.5 25.5v6"/>
+              <path fill="currentColor" d="M14 7h4.6v9.4L26.4 7H31L23.2 17.4 31.6 33h-4.9L20.2 21.2V33H14V7z"/>
+            </svg>
+          </span>
           <span class="brand-title font-serif">KMarket</span>
           <span class="brand-badge km-badge km-badge-gray">V1</span>
         </a>
@@ -54,6 +69,21 @@ import { ThemeService } from '../../services/theme.service';
       gap: 8px;
       text-decoration: none;
       color: var(--km-text-primary);
+    }
+    .brand-mark {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      color: var(--km-text-primary);
+    }
+    .brand-mark svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .brand-accent {
+      fill: var(--km-pastel-green-bg);
     }
     .brand-title {
       font-size: 1.35rem;
