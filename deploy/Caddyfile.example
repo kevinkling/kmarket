@@ -1,0 +1,21 @@
+# Reverse proxy HTTPS para PocketBase (backend en casa).
+#
+# GitHub Pages es HTTPS: la PWA publicada no puede hablar con http://localhost:8090.
+# Este Caddyfile termina TLS y reenvía a Docker en el puerto 8090.
+#
+# 1. Apuntá un DNS A/AAAA (o CNAME de un túnel) a esta máquina.
+# 2. Abrí puertos 80 y 443, o usá Cloudflare Tunnel.
+# 3. Reemplazá pb.tudominio.com
+# 4. Poné esa misma URL en apps/frontend/src/environments/environment.prod.ts
+
+pb.tudominio.com {
+  request_body {
+    max_size 10MB
+  }
+
+  reverse_proxy 127.0.0.1:8090 {
+    transport http {
+      read_timeout 360s
+    }
+  }
+}

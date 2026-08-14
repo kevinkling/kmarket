@@ -7,7 +7,7 @@
 /bazel-out
 
 # Node
-/node_modules
+node_modules
 npm-debug.log
 yarn-error.log
 package-lock.json
@@ -41,3 +41,9 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Monorepo specific
+apps/frontend/dist
+apps/frontend/.angular/cache
+apps/backend/pb_data
+.env
