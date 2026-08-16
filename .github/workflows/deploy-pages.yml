@@ -36,15 +36,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build for GitHub Pages
-        run: pnpm run build:gh-pages
+        run: pnpm --filter frontend run build:gh-pages
 
       - name: Prepare SPA fallback
         run: cp dist/kmarket/browser/index.html dist/kmarket/browser/404.html
+        working-directory: apps/frontend
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/kmarket/browser
+          path: apps/frontend/dist/kmarket/browser
 
   deploy:
     needs: build

@@ -1,0 +1,15 @@
+services:
+  pocketbase:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: kmarket_pocketbase
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./apps/backend/pb_data:/pb/pb_data
+    environment:
+      PB_ENCRYPTION_KEY: ${PB_ENCRYPTION_KEY:-}
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL:-}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD:-}
+    restart: unless-stopped
