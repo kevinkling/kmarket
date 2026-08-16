@@ -5,11 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ThemeService } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
+import { BackendStatusComponent } from '../backend-status/backend-status.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule],
+  imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule, BackendStatusComponent],
   template: `
     <header class="header">
       <div class="header-container">
@@ -34,6 +35,7 @@ import { AuthService } from '../../services/auth.service';
         </a>
         <div class="header-actions">
           <span class="header-subtitle">Despensa inteligente</span>
+          <app-backend-status></app-backend-status>
           <button
             mat-icon-button
             type="button"

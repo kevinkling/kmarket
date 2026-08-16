@@ -1,6 +1,7 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, effect } from '@angular/core';
 import { RecordModel, ClientResponseError } from 'pocketbase';
 import { AuthService } from '../../core/services/auth.service';
+import { ConnectivityService } from '../../core/services/connectivity.service';
 import {
   CategoriaTable,
   EstadoProductoTable,
@@ -18,6 +19,7 @@ export class SyncService {
   constructor(
     private authService: AuthService,
     private ngZone: NgZone,
+    private connectivity: ConnectivityService,
   ) {
     this.authService.currentUser.subscribe((user) => {
       if (user) {
@@ -27,9 +29,12 @@ export class SyncService {
       }
     });
 
-    window.addEventListener('online', () => {
-      if (this.authService.isAuthenticated()) {
+    effect(() => {
+      const status = this.connectivity.status();
+      if (status === 'online' && this.authService.isAuthenticated()) {
         void this.startSync();
+      } else if (status === 'offline') {
+        void this.stopSync();
       }
     });
   }
@@ -43,7 +48,7 @@ export class SyncService {
   }
 
   private async startSync(): Promise<void> {
-    if (!this.authService.isAuthenticated() || !navigator.onLine) {
+    if (!this.authService.isAuthenticated() || !this.connectivity.connected()) {
       return;
     }
 
@@ -133,7 +138,7 @@ export class SyncService {
   }
 
   private queueLocalPush(label: string, task: () => Promise<void>): void {
-    if (this.applyingRemote || !this.authService.isAuthenticated() || !navigator.onLine) {
+    if (this.applyingRemote || !this.authService.isAuthenticated() || !this.connectivity.connected()) {
       return;
     }
     queueMicrotask(() => {

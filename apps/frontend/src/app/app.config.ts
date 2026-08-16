@@ -17,11 +17,17 @@ import {
 } from './infrastructure/persistence';
 import { ImportarSeedInicialUseCase } from './application';
 import { SyncService } from './infrastructure/sync/sync.service';
+import { ConnectivityService } from './core/services/connectivity.service';
 
-export function initializeApp(seedUseCase: ImportarSeedInicialUseCase, syncService: SyncService) {
+export function initializeApp(
+  seedUseCase: ImportarSeedInicialUseCase,
+  syncService: SyncService,
+  connectivity: ConnectivityService,
+) {
   return async () => {
     await seedUseCase.ejecutar();
-    syncService.init(); // Inicializa el SyncService
+    void connectivity.check();
+    syncService.init();
   };
 }
 
@@ -41,7 +47,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
-      deps: [ImportarSeedInicialUseCase, SyncService],
+      deps: [ImportarSeedInicialUseCase, SyncService, ConnectivityService],
       multi: true,
     },
   ],

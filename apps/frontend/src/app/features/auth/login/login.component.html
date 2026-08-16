@@ -4,6 +4,9 @@
       <img src="icons/logo.svg" alt="KMarket" width="56" height="56">
       <h1 class="font-serif">KMarket</h1>
       <p>Entrá con tu cuenta familiar para sincronizar la despensa.</p>
+      <div class="status-row">
+        <app-backend-status></app-backend-status>
+      </div>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
