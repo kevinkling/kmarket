@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,10 +10,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { firstValueFrom } from 'rxjs';
 import { Categoria, Producto } from '../../domain';
 import { GestionarCategoriasUseCase, GestionarProductosUseCase } from '../../application';
 import { ProductoFormSheetComponent } from './sheets/producto-form-sheet.component';
 import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.component';
+import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confirm-sheet.component';
 
 @Component({
   selector: 'app-administracion',
@@ -36,7 +39,14 @@ import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.compo
         <p class="admin-subtitle">Gestiona los productos y categorías de tu despensa</p>
       </div>
 
-      <mat-tab-group class="admin-tabs" animationDuration="150ms">
+      <p class="km-loading" *ngIf="cargando">Cargando catálogo…</p>
+
+      <mat-tab-group
+        class="admin-tabs"
+        animationDuration="150ms"
+        [selectedIndex]="selectedTab"
+        (selectedIndexChange)="onTabChange($event)"
+      >
         <!-- TAB 1: PRODUCTOS -->
         <mat-tab label="Productos">
           <div class="tab-content">
@@ -44,7 +54,13 @@ import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.compo
             <div class="admin-toolbar">
               <mat-form-field appearance="outline" class="search-field">
                 <mat-label>Buscar producto...</mat-label>
-                <input matInput [(ngModel)]="busquedaProducto" (ngModelChange)="filtrarProductos()" />
+                <input
+                  matInput
+                  type="search"
+                  [(ngModel)]="busquedaProducto"
+                  (ngModelChange)="filtrarProductos()"
+                  autocomplete="off"
+                />
                 <mat-icon matSuffix>search</mat-icon>
               </mat-form-field>
 
@@ -97,23 +113,26 @@ import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.compo
                 </div>
 
                 <div class="item-actions">
-                  <button mat-icon-button (click)="abrirModalProducto(prod)" aria-label="Editar">
-                    <mat-icon style="font-size: 20px;">edit</mat-icon>
+                  <button mat-icon-button type="button" (click)="abrirModalProducto(prod)">
+                    <mat-icon class="action-icon">edit</mat-icon>
+                    <span class="sr-only">Editar {{ prod.nombre }}</span>
                   </button>
                   <button
                     mat-icon-button
+                    type="button"
                     color="warn"
                     (click)="eliminarProducto(prod)"
-                    aria-label="Eliminar"
                   >
-                    <mat-icon style="font-size: 20px;">delete</mat-icon>
+                    <mat-icon class="action-icon">delete</mat-icon>
+                    <span class="sr-only">Eliminar {{ prod.nombre }}</span>
                   </button>
                 </div>
               </div>
 
-              <div *ngIf="productosFiltrados.length === 0" class="empty-state">
-                <mat-icon style="font-size: 32px; width: 36px; height: 36px;">search_off</mat-icon>
-                <p>No se encontraron productos.</p>
+              <div *ngIf="productosFiltrados.length === 0" class="empty-state km-empty">
+                <mat-icon class="empty-icon">search_off</mat-icon>
+                <p *ngIf="productos.length === 0">Todavía no hay productos. Creá el primero para armar la despensa.</p>
+                <p *ngIf="productos.length > 0">No hay productos que coincidan con la búsqueda o el filtro.</p>
               </div>
             </div>
           </div>
@@ -157,22 +176,24 @@ import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.compo
                 </div>
 
                 <div class="item-actions">
-                  <button mat-icon-button (click)="abrirModalCategoria(cat)" aria-label="Editar">
-                    <mat-icon style="font-size: 20px;">edit</mat-icon>
+                  <button mat-icon-button type="button" (click)="abrirModalCategoria(cat)">
+                    <mat-icon class="action-icon">edit</mat-icon>
+                    <span class="sr-only">Editar {{ cat.nombre }}</span>
                   </button>
                   <button
                     mat-icon-button
+                    type="button"
                     color="warn"
                     (click)="eliminarCategoria(cat)"
-                    aria-label="Eliminar"
                   >
-                    <mat-icon style="font-size: 20px;">delete</mat-icon>
+                    <mat-icon class="action-icon">delete</mat-icon>
+                    <span class="sr-only">Eliminar {{ cat.nombre }}</span>
                   </button>
                 </div>
               </div>
 
-              <div *ngIf="categorias.length === 0" class="empty-state">
-                <p>No hay categorías cargadas.</p>
+              <div *ngIf="categorias.length === 0" class="empty-state km-empty">
+                <p>Todavía no hay categorías. Creá la primera para organizar el recorrido.</p>
               </div>
             </div>
           </div>
@@ -182,7 +203,7 @@ import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.compo
   `,
   styles: [`
     .page-admin {
-      padding-bottom: 90px;
+      padding-bottom: 16px;
     }
     .admin-header {
       margin-top: 12px;
@@ -199,25 +220,22 @@ import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.compo
       font-size: 0.9rem;
     }
 
-    .admin-tabs {
-      ::ng-deep .mat-mdc-tab-body-content {
-        padding-top: 16px;
-      }
-    }
-
     .tab-content {
       display: flex;
       flex-direction: column;
       gap: 16px;
+      padding-top: 16px;
     }
 
     .admin-toolbar {
       display: flex;
       align-items: center;
       gap: 12px;
+      min-width: 0;
     }
     .search-field {
       flex: 1;
+      min-width: 0;
       margin-bottom: -1.25em;
     }
     .add-btn {
@@ -249,24 +267,31 @@ import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.compo
     }
 
     .admin-item {
+      cursor: default;
+
       &.is-disabled {
         opacity: 0.55;
       }
     }
 
+    .item-title {
+      font-size: 1rem;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+      min-width: 0;
+    }
     .item-main {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      min-width: 0;
+      flex: 1;
     }
     .item-title-row {
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-    .item-title {
-      font-size: 1rem;
-      font-weight: 600;
+      min-width: 0;
     }
     .item-meta {
       display: flex;
@@ -286,12 +311,17 @@ import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.compo
 
     .empty-state {
       padding: 32px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      color: var(--km-text-secondary);
-      font-size: 0.9rem;
+    }
+    .empty-icon,
+    .action-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+    .empty-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
     }
   `]
 })
@@ -302,22 +332,41 @@ export class AdministracionComponent implements OnInit {
 
   busquedaProducto = '';
   categoriaFiltroId = 'todas';
+  selectedTab = 0;
+  cargando = true;
 
   constructor(
     private bottomSheet: MatBottomSheet,
     private snackBar: MatSnackBar,
+    private router: Router,
     private gestionarProductosUseCase: GestionarProductosUseCase,
     private gestionarCategoriasUseCase: GestionarCategoriasUseCase
   ) {}
 
   async ngOnInit(): Promise<void> {
+    this.syncTabFromUrl();
     await this.cargarDatos();
   }
 
+  onTabChange(index: number): void {
+    this.selectedTab = index;
+    const path = index === 1 ? '/administracion/categorias' : '/administracion/productos';
+    void this.router.navigate([path], { replaceUrl: true });
+  }
+
+  private syncTabFromUrl(): void {
+    this.selectedTab = this.router.url.includes('/categorias') ? 1 : 0;
+  }
+
   async cargarDatos(): Promise<void> {
-    this.categorias = await this.gestionarCategoriasUseCase.listar();
-    this.productos = await this.gestionarProductosUseCase.listar();
-    this.filtrarProductos();
+    this.cargando = true;
+    try {
+      this.categorias = await this.gestionarCategoriasUseCase.listar();
+      this.productos = await this.gestionarProductosUseCase.listar();
+      this.filtrarProductos();
+    } finally {
+      this.cargando = false;
+    }
   }
 
   getNombreCategoria(categoriaId: string): string {
@@ -353,21 +402,30 @@ export class AdministracionComponent implements OnInit {
 
       if (producto) {
         await this.gestionarProductosUseCase.actualizar(resultado);
-        this.snackBar.open('Producto actualizado', 'Ok', { duration: 2000 });
+        this.snackBar.open('Producto actualizado', 'Cerrar', { duration: 2000 });
       } else {
         await this.gestionarProductosUseCase.crear(resultado);
-        this.snackBar.open('Producto creado', 'Ok', { duration: 2000 });
+        this.snackBar.open('Producto creado', 'Cerrar', { duration: 2000 });
       }
       await this.cargarDatos();
     });
   }
 
   async eliminarProducto(producto: Producto): Promise<void> {
-    if (confirm(`¿Eliminar el producto "${producto.nombre}"?`)) {
-      await this.gestionarProductosUseCase.eliminar(producto.id);
-      this.snackBar.open('Producto eliminado', 'Ok', { duration: 2000 });
-      await this.cargarDatos();
-    }
+    const sheetRef = this.bottomSheet.open(ConfirmSheetComponent, {
+      data: {
+        title: 'Eliminar producto',
+        message: `¿Eliminar «${producto.nombre}» de la despensa? Esta acción no se puede deshacer.`,
+        confirmLabel: 'Eliminar',
+        destructive: true,
+      },
+    });
+
+    const ok = await firstValueFrom(sheetRef.afterDismissed());
+    if (!ok) return;
+    await this.gestionarProductosUseCase.eliminar(producto.id);
+    this.snackBar.open('Producto eliminado', 'Cerrar', { duration: 2000 });
+    await this.cargarDatos();
   }
 
   abrirModalCategoria(categoria?: Categoria): void {
@@ -384,10 +442,10 @@ export class AdministracionComponent implements OnInit {
 
       if (categoria) {
         await this.gestionarCategoriasUseCase.actualizar(resultado);
-        this.snackBar.open('Categoría actualizada', 'Ok', { duration: 2000 });
+        this.snackBar.open('Categoría actualizada', 'Cerrar', { duration: 2000 });
       } else {
         await this.gestionarCategoriasUseCase.crear(resultado);
-        this.snackBar.open('Categoría creada', 'Ok', { duration: 2000 });
+        this.snackBar.open('Categoría creada', 'Cerrar', { duration: 2000 });
       }
       await this.cargarDatos();
     });
@@ -396,14 +454,30 @@ export class AdministracionComponent implements OnInit {
   async eliminarCategoria(categoria: Categoria): Promise<void> {
     const prods = this.productos.filter((p) => p.categoriaId === categoria.id);
     if (prods.length > 0) {
-      alert(`No se puede eliminar la categoría porque contiene ${prods.length} productos.`);
+      this.bottomSheet.open(ConfirmSheetComponent, {
+        data: {
+          title: 'No se puede eliminar',
+          message: `«${categoria.nombre}» tiene ${prods.length} productos. Movélos o eliminalos antes de borrar la categoría.`,
+          confirmLabel: 'Entendido',
+          cancelLabel: 'Cerrar',
+        },
+      });
       return;
     }
 
-    if (confirm(`¿Eliminar la categoría "${categoria.nombre}"?`)) {
-      await this.gestionarCategoriasUseCase.eliminar(categoria.id);
-      this.snackBar.open('Categoría eliminada', 'Ok', { duration: 2000 });
-      await this.cargarDatos();
-    }
+    const sheetRef = this.bottomSheet.open(ConfirmSheetComponent, {
+      data: {
+        title: 'Eliminar categoría',
+        message: `¿Eliminar «${categoria.nombre}»? Esta acción no se puede deshacer.`,
+        confirmLabel: 'Eliminar',
+        destructive: true,
+      },
+    });
+
+    const ok = await firstValueFrom(sheetRef.afterDismissed());
+    if (!ok) return;
+    await this.gestionarCategoriasUseCase.eliminar(categoria.id);
+    this.snackBar.open('Categoría eliminada', 'Cerrar', { duration: 2000 });
+    await this.cargarDatos();
   }
 }

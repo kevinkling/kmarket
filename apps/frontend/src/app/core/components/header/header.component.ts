@@ -40,19 +40,19 @@ import { BackendStatusComponent } from '../backend-status/backend-status.compone
             mat-icon-button
             type="button"
             class="theme-toggle"
-            [attr.aria-label]="theme.mode() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo nocturno'"
             (click)="theme.toggle()"
           >
             <mat-icon>{{ theme.mode() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+            <span class="sr-only">{{ theme.mode() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo nocturno' }}</span>
           </button>
           <button
             mat-icon-button
             type="button"
-            aria-label="Cerrar sesión"
             (click)="logout()"
             *ngIf="auth.isAuthenticated()"
           >
             <mat-icon>logout</mat-icon>
+            <span class="sr-only">Cerrar sesión</span>
           </button>
         </div>
       </div>
@@ -62,7 +62,7 @@ import { BackendStatusComponent } from '../backend-status/backend-status.compone
     .header {
       background-color: var(--km-bg-surface);
       border-bottom: var(--km-border);
-      padding: 10px 12px 10px 20px;
+      padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px 20px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -79,6 +79,7 @@ import { BackendStatusComponent } from '../backend-status/backend-status.compone
       display: flex;
       align-items: center;
       gap: 8px;
+      min-width: 0;
       text-decoration: none;
       color: var(--km-text-primary);
     }
@@ -101,6 +102,10 @@ import { BackendStatusComponent } from '../backend-status/backend-status.compone
       font-size: 1.35rem;
       font-weight: 600;
       letter-spacing: -0.02em;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .header-actions {
       display: flex;

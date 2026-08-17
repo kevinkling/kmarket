@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +13,7 @@ import {
   ObtenerListaDeCompraUseCase,
   ProductoConEstado,
 } from '../../application';
+import { runViewTransition } from '../../core/utils/view-transition';
 
 export type ModoVista = 'resumen' | 'recorrido' | 'revision';
 
@@ -28,19 +29,20 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
     MatSnackBarModule,
   ],
   template: `
-    <div class="preparar-wrapper">
+    <div class="preparar-wrapper" [class.has-footer]="modo === 'recorrido' || modo === 'revision'">
       <!-- Top Wizard Header -->
       <header class="wizard-header">
         <div class="wizard-header-content">
-          <button mat-icon-button (click)="salir()" aria-label="Salir">
+          <button mat-icon-button type="button" (click)="salir()">
             <mat-icon>close</mat-icon>
+            <span class="sr-only">Volver al inicio</span>
           </button>
-          <div class="wizard-title font-serif">
+          <div class="wizard-title font-serif km-vt-stage">
             <span *ngIf="modo === 'resumen'">Preparar compra</span>
             <span *ngIf="modo === 'recorrido'">Recorrido por categoría</span>
             <span *ngIf="modo === 'revision'">Revisión final</span>
           </div>
-          <div style="width: 40px;"></div>
+          <span class="header-spacer" aria-hidden="true"></span>
         </div>
 
         <!-- Progress bar during category recorrido -->
@@ -49,18 +51,39 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
           mode="determinate"
           [value]="progresoPorcentaje"
           class="wizard-progress"
-        ></mat-progress-bar>
+        >
+        </mat-progress-bar>
+        <span class="sr-only" *ngIf="modo === 'recorrido' && categorias.length > 0">
+          Progreso del recorrido: categoría {{ indiceCategoria + 1 }} de {{ categorias.length }}
+        </span>
       </header>
 
       <!-- Main Content Area -->
-      <main class="wizard-body km-container">
+      <div class="wizard-body km-container">
+        <div *ngIf="cargando" class="view-step">
+          <p class="km-loading">Cargando el recorrido…</p>
+        </div>
+
+        <div *ngIf="!cargando && categorias.length === 0" class="view-step">
+          <div class="step-card km-card km-empty">
+            <mat-icon class="empty-icon">inventory_2</mat-icon>
+            <h1 class="font-serif step-title">Todavía no hay categorías</h1>
+            <p class="step-desc">
+              Cargá categorías y productos en Administración para poder preparar una compra.
+            </p>
+            <button mat-flat-button class="km-btn-primary full-width" type="button" (click)="irAAdministracion()">
+              Ir a administración
+            </button>
+          </div>
+        </div>
+
         <!-- VISTA 1: RESUMEN INICIAL -->
-        <div *ngIf="modo === 'resumen'" class="view-step fade-in">
-          <div class="step-card km-card">
+        <div *ngIf="!cargando && categorias.length > 0 && modo === 'resumen'" class="view-step fade-in">
+          <div class="step-card km-card km-vt-sheet">
             <div class="step-icon">
               <mat-icon>checklist_rtl</mat-icon>
             </div>
-            <h2 class="font-serif step-title">¿Listo para la compra?</h2>
+            <h1 class="font-serif step-title km-vt-leaf">¿Listo para la compra?</h1>
             <p class="step-desc">
               Recorrerás tu despensa categoría por categoría para marcar únicamente los productos que faltan.
             </p>
@@ -108,15 +131,21 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                 {{ marcadosEnCategoriaActual }} de {{ categoriaActual.items.length }} marcados
               </span>
             </div>
-            <h1 class="category-title font-serif">{{ categoriaActual.categoria.nombre }}</h1>
+            <h1 class="category-title font-serif km-vt-leaf">{{ categoriaActual.categoria.nombre }}</h1>
           </div>
 
-          <div class="km-card list-card">
+          <div class="km-card list-card km-vt-sheet">
             <div
               *ngFor="let item of categoriaActual.items"
               class="km-list-item"
               [class.is-selected]="item.estado.comprar"
+              [class.is-settling]="settlingId === item.producto.id"
+              role="button"
+              tabindex="0"
+              [attr.aria-pressed]="item.estado.comprar"
               (click)="toggleProducto(item)"
+              (keydown.enter)="toggleProducto(item)"
+              (keydown.space)="$event.preventDefault(); toggleProducto(item)"
             >
               <div class="item-info">
                 <span class="item-name">{{ item.producto.nombre }}</span>
@@ -125,9 +154,11 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                 </span>
               </div>
               <mat-checkbox
+                class="check-visual"
                 [checked]="item.estado.comprar"
-                (click)="$event.stopPropagation()"
-                (change)="toggleProducto(item)"
+                [disableRipple]="true"
+                tabindex="-1"
+                aria-hidden="true"
               ></mat-checkbox>
             </div>
 
@@ -140,13 +171,13 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
         <!-- VISTA 3: REVISIÓN FINAL -->
         <div *ngIf="modo === 'revision'" class="view-step fade-in">
           <div class="revision-header">
-            <h1 class="font-serif revision-title">Resumen de compra</h1>
+            <h1 class="font-serif revision-title km-vt-leaf">Resumen de compra</h1>
             <p class="revision-desc">
               Revisa los {{ totalSeleccionados }} productos seleccionados antes de finalizar.
             </p>
           </div>
 
-          <div class="revision-content">
+          <div class="revision-content km-vt-sheet">
             <div
               *ngFor="let catGroup of categoriasConSeleccionados"
               class="revision-group km-card"
@@ -158,35 +189,46 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                 *ngFor="let item of catGroup.items"
                 class="km-list-item"
                 [class.is-selected]="item.estado.comprar"
+                [class.is-settling]="settlingId === item.producto.id"
+                role="button"
+                tabindex="0"
+                [attr.aria-pressed]="item.estado.comprar"
                 (click)="toggleProducto(item)"
+                (keydown.enter)="toggleProducto(item)"
+                (keydown.space)="$event.preventDefault(); toggleProducto(item)"
               >
                 <span class="item-name">{{ item.producto.nombre }}</span>
                 <mat-checkbox
+                  class="check-visual"
                   [checked]="item.estado.comprar"
-                  (click)="$event.stopPropagation()"
-                  (change)="toggleProducto(item)"
+                  [disableRipple]="true"
+                  tabindex="-1"
+                  aria-hidden="true"
                 ></mat-checkbox>
               </div>
             </div>
 
-            <div *ngIf="totalSeleccionados === 0" class="empty-revision km-card">
-              <mat-icon style="font-size: 36px; width: 36px; height: 36px; color: var(--km-text-muted);">remove_shopping_cart</mat-icon>
+            <div *ngIf="totalSeleccionados === 0" class="empty-revision km-card km-empty">
+              <mat-icon class="empty-icon">remove_shopping_cart</mat-icon>
               <p>No has seleccionado ningún producto para comprar.</p>
-              <button mat-stroked-button class="km-btn-secondary" (click)="modo = 'recorrido'">
+              <button mat-stroked-button class="km-btn-secondary" type="button" (click)="volverAlRecorrido()">
                 Volver al recorrido
               </button>
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
       <!-- Wizard Bottom Navigation -->
       <footer class="wizard-footer" *ngIf="modo === 'recorrido' || modo === 'revision'">
         <div class="footer-container km-container">
-          <ng-container *ngIf="modo === 'recorrido'">
+          <p class="footer-error" *ngIf="modo === 'revision' && errorFinalizar" role="alert">{{ errorFinalizar }}</p>
+          <div class="footer-actions">
+            <ng-container *ngIf="modo === 'recorrido'">
             <button
               mat-stroked-button
               class="km-btn-secondary nav-btn"
+              type="button"
               [disabled]="indiceCategoria === 0"
               (click)="anteriorCategoria()"
             >
@@ -197,6 +239,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
             <button
               mat-flat-button
               class="km-btn-primary nav-btn"
+              type="button"
               (click)="siguienteCategoria()"
             >
               {{ esUltimaCategoria ? 'Ver revisión (' + totalSeleccionados + ')' : 'Siguiente' }}
@@ -208,22 +251,26 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
             <button
               mat-stroked-button
               class="km-btn-secondary nav-btn"
-              (click)="modo = 'recorrido'"
+              type="button"
+              [disabled]="procesando"
+              (click)="confirmandoFinalizar ? cancelarFinalizar() : volverAlRecorrido()"
             >
-              <mat-icon>edit</mat-icon>
-              Modificar
+              <mat-icon>{{ confirmandoFinalizar ? 'close' : 'edit' }}</mat-icon>
+              {{ confirmandoFinalizar ? 'Cancelar' : 'Modificar' }}
             </button>
 
             <button
               mat-flat-button
               class="km-btn-primary nav-btn"
+              type="button"
               [disabled]="totalSeleccionados === 0 || procesando"
-              (click)="finalizarCompra()"
+              (click)="pedirOConfirmarFinalizar()"
             >
               <mat-icon>check</mat-icon>
-              Finalizar compra ({{ totalSeleccionados }})
+              {{ etiquetaFinalizar }}
             </button>
           </ng-container>
+          </div>
         </div>
       </footer>
     </div>
@@ -234,7 +281,11 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       background-color: var(--km-bg-canvas);
       display: flex;
       flex-direction: column;
-      padding-bottom: 90px;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+
+      &.has-footer {
+        padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+      }
     }
 
     .wizard-header {
@@ -243,6 +294,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       z-index: 100;
       background-color: var(--km-bg-surface);
       border-bottom: var(--km-border);
+      padding-top: env(safe-area-inset-top, 0px);
     }
     .wizard-header-content {
       max-width: 600px;
@@ -253,15 +305,22 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       justify-content: space-between;
       padding: 0 8px;
     }
+    .header-spacer {
+      width: 40px;
+      height: 40px;
+    }
     .wizard-title {
       font-size: 1.1rem;
       font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .wizard-progress {
       height: 3px !important;
-      ::ng-deep .mdc-linear-progress__bar-inner {
-        border-color: var(--km-text-primary) !important;
-      }
     }
 
     .wizard-body {
@@ -296,12 +355,14 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
     .step-title {
       font-size: 1.75rem;
       margin: 0;
+      overflow-wrap: anywhere;
     }
     .step-desc {
       color: var(--km-text-secondary);
       font-size: 0.95rem;
       margin: 0;
       line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
     .summary-box {
@@ -365,20 +426,45 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       font-weight: 500;
       margin: 0;
       letter-spacing: -0.02em;
+      overflow-wrap: anywhere;
     }
 
     .list-card {
       padding: 0;
       overflow: hidden;
     }
+    .km-list-item.is-settling {
+      animation: km-settle 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes km-settle {
+      0% { transform: scale(1); }
+      34% { transform: scale(0.985); }
+      100% { transform: scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .km-list-item.is-settling {
+        animation: none;
+      }
+    }
     .item-info {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      min-width: 0;
+      flex: 1;
     }
     .item-name {
       font-size: 1rem;
       font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+    .check-visual {
+      pointer-events: none;
+      flex-shrink: 0;
+
+      ::ng-deep .mdc-label {
+        display: none;
+      }
     }
     .empty-cat {
       padding: 24px;
@@ -394,6 +480,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
     .revision-title {
       font-size: 2rem;
       margin: 0 0 6px 0;
+      overflow-wrap: anywhere;
     }
     .revision-desc {
       color: var(--km-text-secondary);
@@ -414,15 +501,16 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       font-weight: 600;
       padding: 14px 16px;
       background-color: var(--km-bg-canvas);
+      overflow-wrap: anywhere;
     }
     .empty-revision {
       padding: 32px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 12px;
-      color: var(--km-text-secondary);
+    }
+    .empty-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+      color: var(--km-text-muted);
     }
 
     /* Wizard Bottom Footer */
@@ -438,25 +526,51 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
     }
     .footer-container {
       display: flex;
-      gap: 12px;
+      flex-direction: column;
+      gap: 8px;
       padding: 0;
+    }
+    .footer-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .footer-error {
+      margin: 0;
+      color: var(--km-pastel-red-text);
+      font-size: 0.85rem;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
     }
     .nav-btn {
       flex: 1;
-      height: 48px;
+      min-height: 48px;
+      height: auto;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
       font-size: 0.95rem;
+      white-space: normal;
+      line-height: 1.2;
+      padding-block: 10px;
     }
 
     .fade-in {
-      animation: fadeIn 0.2s ease-in-out;
+      animation: fadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @supports (view-transition-name: none) {
+      html:active-view-transition .fade-in {
+        animation: none;
+      }
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(8px); filter: blur(2px); }
+      to { opacity: 1; transform: none; filter: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fade-in {
+        animation: none;
+      }
     }
   `]
 })
@@ -465,10 +579,15 @@ export class PrepararCompraComponent implements OnInit {
   categorias: CategoriaConProductos[] = [];
   indiceCategoria = 0;
   procesando = false;
+  cargando = true;
+  settlingId: string | null = null;
+  confirmandoFinalizar = false;
+  errorFinalizar = '';
 
   constructor(
     private router: Router,
     private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
     private obtenerListaCompraUseCase: ObtenerListaDeCompraUseCase,
     private alternarProductoUseCase: AlternarProductoEnCompraUseCase,
     private finalizarCompraUseCase: FinalizarCompraUseCase
@@ -479,7 +598,12 @@ export class PrepararCompraComponent implements OnInit {
   }
 
   async cargarDatos(): Promise<void> {
-    this.categorias = await this.obtenerListaCompraUseCase.obtenerAgrupadoPorCategoria(false);
+    this.cargando = true;
+    try {
+      this.categorias = await this.obtenerListaCompraUseCase.obtenerAgrupadoPorCategoria(false);
+    } finally {
+      this.cargando = false;
+    }
   }
 
   get categoriaActual(): CategoriaConProductos | null {
@@ -490,15 +614,7 @@ export class PrepararCompraComponent implements OnInit {
   }
 
   get totalSugeridos(): number {
-    let count = 0;
-    for (const cat of this.categorias) {
-      for (const item of cat.items) {
-        if (item.estado.comprar) {
-          count++;
-        }
-      }
-    }
-    return count;
+    return this.totalSeleccionados;
   }
 
   get totalSeleccionados(): number {
@@ -536,54 +652,109 @@ export class PrepararCompraComponent implements OnInit {
       .filter((cat) => cat.items.length > 0);
   }
 
+  get etiquetaFinalizar(): string {
+    if (this.procesando) {
+      return 'Cerrando compra…';
+    }
+    if (this.confirmandoFinalizar) {
+      return this.totalSeleccionados === 1
+        ? 'Sí, cerrar 1 producto'
+        : `Sí, cerrar ${this.totalSeleccionados} productos`;
+    }
+    return `Finalizar compra (${this.totalSeleccionados})`;
+  }
+
   comenzarRecorrido(): void {
-    this.modo = 'recorrido';
-    this.indiceCategoria = 0;
+    runViewTransition(this.cdr, 'forward', () => {
+      this.modo = 'recorrido';
+      this.indiceCategoria = 0;
+    });
   }
 
   irARevision(): void {
-    this.modo = 'revision';
+    this.confirmandoFinalizar = false;
+    this.errorFinalizar = '';
+    runViewTransition(this.cdr, 'forward', () => {
+      this.modo = 'revision';
+    });
+  }
+
+  volverAlRecorrido(): void {
+    this.confirmandoFinalizar = false;
+    this.errorFinalizar = '';
+    runViewTransition(this.cdr, 'back', () => {
+      this.modo = 'recorrido';
+    });
   }
 
   siguienteCategoria(): void {
-    if (this.esUltimaCategoria) {
-      this.modo = 'revision';
-    } else {
-      this.indiceCategoria++;
-    }
+    this.confirmandoFinalizar = false;
+    this.errorFinalizar = '';
+    runViewTransition(this.cdr, 'forward', () => {
+      if (this.esUltimaCategoria) {
+        this.modo = 'revision';
+      } else {
+        this.indiceCategoria++;
+      }
+    });
   }
 
   anteriorCategoria(): void {
-    if (this.indiceCategoria > 0) {
+    if (this.indiceCategoria === 0) return;
+    runViewTransition(this.cdr, 'back', () => {
       this.indiceCategoria--;
-    }
+    });
   }
 
   async toggleProducto(item: ProductoConEstado): Promise<void> {
     const nuevoValor = !item.estado.comprar;
     item.estado.comprar = nuevoValor;
+    this.settlingId = item.producto.id;
+    window.setTimeout(() => {
+      if (this.settlingId === item.producto.id) {
+        this.settlingId = null;
+      }
+    }, 420);
     await this.alternarProductoUseCase.ejecutar(item.producto.id, nuevoValor);
+  }
+
+  pedirOConfirmarFinalizar(): void {
+    if (this.procesando || this.totalSeleccionados === 0) return;
+    this.errorFinalizar = '';
+    if (!this.confirmandoFinalizar) {
+      this.confirmandoFinalizar = true;
+      return;
+    }
+    void this.finalizarCompra();
+  }
+
+  cancelarFinalizar(): void {
+    this.confirmandoFinalizar = false;
+    this.errorFinalizar = '';
   }
 
   async finalizarCompra(): Promise<void> {
     if (this.procesando) return;
     this.procesando = true;
+    this.errorFinalizar = '';
 
     try {
       const cantidad = await this.finalizarCompraUseCase.ejecutar();
       this.snackBar.open(
-        `¡Compra finalizada! Se actualizaron ${cantidad} productos.`,
+        `Compra cerrada. Se actualizaron ${cantidad} productos en la despensa.`,
         'Cerrar',
         { duration: 4000 }
       );
       this.router.navigate(['/']);
-    } catch (err) {
-      this.snackBar.open('Ocurrió un error al finalizar la compra.', 'Cerrar', {
-        duration: 3000,
-      });
-    } finally {
+    } catch {
+      this.errorFinalizar = 'No se pudo cerrar la compra. Revisá la conexión e intentá de nuevo.';
       this.procesando = false;
+      this.confirmandoFinalizar = true;
     }
+  }
+
+  irAAdministracion(): void {
+    this.router.navigate(['/administracion']);
   }
 
   salir(): void {

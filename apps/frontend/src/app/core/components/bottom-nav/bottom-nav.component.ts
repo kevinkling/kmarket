@@ -1,21 +1,30 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-bottom-nav',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, MatIconModule],
+  imports: [RouterLink, RouterLinkActive, MatIconModule],
   template: `
-    <nav class="bottom-nav" *ngIf="mostrarNav">
+    <nav class="bottom-nav" aria-label="Navegación principal">
       <div class="nav-container">
-        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: true}"
+          ariaCurrentWhenActive="page"
+          class="nav-item"
+        >
           <mat-icon>home</mat-icon>
           <span>Inicio</span>
         </a>
-        <a routerLink="/administracion" routerLinkActive="active" class="nav-item">
+        <a
+          routerLink="/administracion"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          class="nav-item"
+        >
           <mat-icon>tune</mat-icon>
           <span>Administrar</span>
         </a>
@@ -37,7 +46,7 @@ import { filter } from 'rxjs/operators';
       max-width: 600px;
       margin: 0 auto;
       display: flex;
-      height: 56px;
+      min-height: 56px;
     }
     .nav-item {
       flex: 1;
@@ -49,6 +58,7 @@ import { filter } from 'rxjs/operators';
       color: var(--km-text-secondary);
       font-size: 0.725rem;
       gap: 3px;
+      min-height: 56px;
       transition: color 0.15s ease;
 
       mat-icon {
@@ -64,16 +74,4 @@ import { filter } from 'rxjs/operators';
     }
   `]
 })
-export class BottomNavComponent {
-  mostrarNav = true;
-
-  constructor(private router: Router) {
-    this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe((event) => {
-        // Hide bottom nav during the full-screen "Preparar compra" wizard
-        this.mostrarNav = !event.urlAfterRedirects.includes('/preparar-compra')
-          && !event.urlAfterRedirects.startsWith('/login');
-      });
-  }
-}
+export class BottomNavComponent {}

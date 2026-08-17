@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-17T20:05:00.000-03:00",
+  "title": "Design System: KMarket",
+  "extensions": {
+    "colorMeta": {
+      "tinta": {
+        "role": "primary",
+        "displayName": "Tinta de despensa",
+        "canonical": "#111111",
+        "tonalRamp": ["#111111", "#2A2A28", "#4A4946", "#6E6D6A", "#9A9995", "#C4C3BF", "#EAEAEA", "#FBFBFA"]
+      },
+      "tinta-hover": {
+        "role": "primary",
+        "displayName": "Tinta hover",
+        "canonical": "#333333",
+        "tonalRamp": ["#1A1A1A", "#333333", "#4D4D4D", "#666666", "#808080", "#999999", "#B3B3B3", "#E6E6E6"]
+      },
+      "tinta-invertida": {
+        "role": "primary",
+        "displayName": "Tinta invertida",
+        "canonical": "#FFFFFF",
+        "tonalRamp": ["#111111", "#333333", "#666666", "#999999", "#CCCCCC", "#EAEAEA", "#F5F4F1", "#FFFFFF"]
+      },
+      "papel": {
+        "role": "neutral",
+        "displayName": "Papel",
+        "canonical": "#FBFBFA",
+        "tonalRamp": ["#141413", "#1C1C1A", "#242422", "#5C5B58", "#9A9995", "#EAEAEA", "#FAF9F6", "#FBFBFA"]
+      },
+      "superficie": {
+        "role": "neutral",
+        "displayName": "Superficie",
+        "canonical": "#FFFFFF",
+        "tonalRamp": ["#1C1C1A", "#242422", "#2E2E2B", "#5A5A58", "#C4C3BF", "#F1F1EF", "#FAF9F6", "#FFFFFF"]
+      },
+      "elevado": {
+        "role": "neutral",
+        "displayName": "Elevado",
+        "canonical": "#FAF9F6",
+        "tonalRamp": ["#242422", "#2A2A28", "#4A4946", "#6E6D6A", "#C4C3BF", "#F1F1EF", "#FAF9F6", "#FBFBFA"]
+      },
+      "borde": {
+        "role": "neutral",
+        "displayName": "Borde",
+        "canonical": "#EAEAEA",
+        "tonalRamp": ["#2E2E2B", "#4A4946", "#6E6D6A", "#9A9995", "#C4C3BF", "#EAEAEA", "#F1F1EF", "#FBFBFA"]
+      },
+      "texto-secundario": {
+        "role": "neutral",
+        "displayName": "Texto secundario",
+        "canonical": "#5C5B58",
+        "tonalRamp": ["#2A2A28", "#5C5B58", "#6E6D6A", "#9A9995", "#C4C3BF", "#EAEAEA", "#F1F1EF", "#FBFBFA"]
+      },
+      "texto-apagado": {
+        "role": "neutral",
+        "displayName": "Texto apagado",
+        "canonical": "#6E6D6A",
+        "tonalRamp": ["#2A2A28", "#5A5A58", "#6E6D6A", "#9A9995", "#C4C3BF", "#EAEAEA", "#F1F1EF", "#FBFBFA"]
+      },
+      "overlay": {
+        "role": "neutral",
+        "displayName": "Overlay",
+        "canonical": "rgba(0, 0, 0, 0.05)",
+        "tonalRamp": ["rgba(0,0,0,0.24)", "rgba(0,0,0,0.16)", "rgba(0,0,0,0.12)", "rgba(0,0,0,0.08)", "rgba(0,0,0,0.05)", "rgba(0,0,0,0.03)", "rgba(0,0,0,0.02)", "rgba(0,0,0,0.01)"]
+      },
+      "pastel-amarillo-fondo": {
+        "role": "secondary",
+        "displayName": "Pastel amarillo fondo",
+        "canonical": "#FBF3DB",
+        "tonalRamp": ["#2F2A1A", "#5C4A18", "#956400", "#C9A227", "#E0C070", "#F3E4B8", "#FBF3DB", "#FEFBF3"]
+      },
+      "pastel-amarillo-tinta": {
+        "role": "secondary",
+        "displayName": "Pastel amarillo tinta",
+        "canonical": "#956400",
+        "tonalRamp": ["#2F2A1A", "#5C4A18", "#956400", "#C9A227", "#E0C070", "#F3E4B8", "#FBF3DB", "#FEFBF3"]
+      },
+      "pastel-verde-fondo": {
+        "role": "secondary",
+        "displayName": "Pastel verde fondo",
+        "canonical": "#EDF3EC",
+        "tonalRamp": ["#1E2A1E", "#27462A", "#346538", "#5A8A5C", "#8FBF90", "#C5DCC4", "#EDF3EC", "#F7FAF6"]
+      },
+      "pastel-verde-tinta": {
+        "role": "secondary",
+        "displayName": "Pastel verde tinta",
+        "canonical": "#346538",
+        "tonalRamp": ["#1E2A1E", "#27462A", "#346538", "#5A8A5C", "#8FBF90", "#C5DCC4", "#EDF3EC", "#F7FAF6"]
+      },
+      "pastel-rojo-fondo": {
+        "role": "tertiary",
+        "displayName": "Pastel rojo fondo",
+        "canonical": "#FDEBEC",
+        "tonalRamp": ["#2F1C1C", "#6B2422", "#9F2F2D", "#C45A56", "#E09090", "#F5C8C8", "#FDEBEC", "#FFF8F8"]
+      },
+      "pastel-rojo-tinta": {
+        "role": "tertiary",
+        "displayName": "Pastel rojo tinta",
+        "canonical": "#9F2F2D",
+        "tonalRamp": ["#2F1C1C", "#6B2422", "#9F2F2D", "#C45A56", "#E09090", "#F5C8C8", "#FDEBEC", "#FFF8F8"]
+      },
+      "pastel-azul-fondo": {
+        "role": "secondary",
+        "displayName": "Pastel azul fondo",
+        "canonical": "#E1F3FE",
+        "tonalRamp": ["#1A2530", "#163E5C", "#1F6C9F", "#4A92BE", "#7EB4D8", "#B7D9F0", "#E1F3FE", "#F3FAFE"]
+      },
+      "pastel-azul-tinta": {
+        "role": "secondary",
+        "displayName": "Pastel azul tinta",
+        "canonical": "#1F6C9F",
+        "tonalRamp": ["#1A2530", "#163E5C", "#1F6C9F", "#4A92BE", "#7EB4D8", "#B7D9F0", "#E1F3FE", "#F3FAFE"]
+      },
+      "pastel-gris-fondo": {
+        "role": "neutral",
+        "displayName": "Pastel gris fondo",
+        "canonical": "#F1F1EF",
+        "tonalRamp": ["#2A2A28", "#5A5A58", "#6E6D6A", "#9A9995", "#C4C3BF", "#EAEAEA", "#F1F1EF", "#FBFBFA"]
+      },
+      "pastel-gris-tinta": {
+        "role": "neutral",
+        "displayName": "Pastel gris tinta",
+        "canonical": "#5A5A58",
+        "tonalRamp": ["#2A2A28", "#5A5A58", "#6E6D6A", "#9A9995", "#C4C3BF", "#EAEAEA", "#F1F1EF", "#FBFBFA"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Título de Inicio (Newsreader 2rem)." },
+      "headline": { "displayName": "Headline", "purpose": "Paso del wizard y marca de login." },
+      "title": { "displayName": "Title", "purpose": "Wordmark y títulos de bottom sheet." },
+      "body": { "displayName": "Body", "purpose": "Párrafos, filas y descripciones en sans de sistema." },
+      "label": { "displayName": "Label", "purpose": "Badges uppercase y meta del chrome." }
+    },
+    "shadows": [
+      {
+        "name": "sheet-lift",
+        "value": "0 -4px 20px rgba(0, 0, 0, 0.05)",
+        "purpose": "Única sombra estructural: el bottom sheet que sube del borde."
+      },
+      {
+        "name": "material-flatten",
+        "value": "0 1px 3px rgba(0, 0, 0, 0.05)",
+        "purpose": "Residuo de mat-elevation; no usar en cards nuevas."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-settle",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "View transitions de página y hojas (0.32–0.42s)."
+      },
+      {
+        "name": "ease-state",
+        "value": "0.15s ease",
+        "purpose": "Hover de botones, filas y nav; press scale 0.98 en primario."
+      },
+      {
+        "name": "theme-fade",
+        "value": "0.2s ease",
+        "purpose": "Cambio de background-color y color al togglar tema."
+      }
+    ],
+    "breakpoints": [
+      { "name": "header-subtitle", "value": "480px" },
+      { "name": "aisle", "value": "600px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "CTA de tinta: Preparar compra, Finalizar, Entrar.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Preparar compra</button>",
+      "css": ".ds-btn-primary { background: #111111; color: #FFFFFF; border: none; border-radius: 6px; padding: 12px 16px; min-height: 48px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.95rem; font-weight: 500; letter-spacing: -0.01em; cursor: pointer; transition: transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease; } .ds-btn-primary:hover:not(:disabled) { background: #333333; } .ds-btn-primary:active:not(:disabled) { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: 2px solid #111111; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción secundaria con hairline: Cancelar, Anterior.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Cancelar</button>",
+      "css": ".ds-btn-secondary { background: #FFFFFF; color: #111111; border: 1px solid #EAEAEA; border-radius: 6px; padding: 12px 16px; min-height: 48px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.95rem; font-weight: 500; letter-spacing: -0.01em; cursor: pointer; transition: background-color 0.15s ease; } .ds-btn-secondary:hover:not(:disabled) { background: #FAF9F6; } .ds-btn-secondary:focus-visible { outline: 2px solid #111111; outline-offset: 2px; } .ds-btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Recorte pastel: sugerencias, V1, estados. Nunca como botón.",
+      "html": "<span class=\"ds-badge ds-badge-yellow\">3 sugerencias</span><span class=\"ds-badge ds-badge-gray\">V1</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 9999px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.725rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; margin-right: 8px; } .ds-badge-yellow { background: #FBF3DB; color: #956400; } .ds-badge-gray { background: #F1F1EF; color: #5A5A58; }"
+    },
+    {
+      "name": "Surface Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Contenedor plano de 10px: estado, atajos, login.",
+      "html": "<article class=\"ds-card\"><h2 class=\"ds-card-title\">¿Salís a comprar?</h2><p class=\"ds-card-body\">KMarket no administra listas. Recorre la despensa pasillo a pasillo.</p></article>",
+      "css": ".ds-card { background: #FFFFFF; color: #111111; border: 1px solid #EAEAEA; border-radius: 10px; padding: 16px; box-shadow: none; } .ds-card-title { font-family: Newsreader, Georgia, serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; } .ds-card-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.95rem; line-height: 1.5; color: #5C5B58; margin: 0; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de login: hairline, 48px, foco tinta.",
+      "html": "<label class=\"ds-field\">Email <input class=\"ds-input\" type=\"email\" placeholder=\"familia@ejemplo.com\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.85rem; color: #5C5B58; } .ds-input { width: 100%; box-sizing: border-box; border: 1px solid #EAEAEA; border-radius: 6px; background: #FFFFFF; color: #111111; padding: 12px 14px; font-size: 1rem; min-height: 48px; } .ds-input::placeholder { color: #6E6D6A; } .ds-input:focus { outline: 2px solid #111111; outline-offset: 1px; }"
+    },
+    {
+      "name": "Bottom Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Dos destinos a 56px; activo en tinta, inactivo secundario.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navegación principal\"><a class=\"ds-nav-item ds-nav-item-active\" href=\"#\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z\"/></svg>Inicio</a><a class=\"ds-nav-item\" href=\"#\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 4v2M12 18v2M4 12h2M18 12h2\"/></svg>Administrar</a></nav>",
+      "css": ".ds-nav { display: flex; max-width: 600px; border-top: 1px solid #EAEAEA; background: #FFFFFF; } .ds-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 56px; text-decoration: none; color: #5C5B58; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.725rem; } .ds-nav-item-active { color: #111111; font-weight: 600; } .ds-nav-item:focus-visible { outline: 2px solid #111111; outline-offset: 2px; } .ds-nav-icon { width: 22px; height: 22px; }"
+    },
+    {
+      "name": "List Row",
+      "kind": "custom",
+      "refersTo": "list-item",
+      "description": "Fila de pasillo: un control, divisor, seleccionado = elevado.",
+      "html": "<div class=\"ds-list\"><button class=\"ds-row\" type=\"button\"><span class=\"ds-row-name\">Leche entera</span><span class=\"ds-check\" aria-hidden=\"true\"></span></button><button class=\"ds-row ds-row-selected\" type=\"button\"><span class=\"ds-row-name\">Pan lactal</span><span class=\"ds-check ds-check-on\" aria-hidden=\"true\"></span></button></div>",
+      "css": ".ds-list { border: 1px solid #EAEAEA; border-radius: 10px; overflow: hidden; background: #FFFFFF; } .ds-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 14px 16px; border: none; border-bottom: 1px solid #EAEAEA; background: #FFFFFF; color: #111111; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.95rem; text-align: left; cursor: pointer; } .ds-row:last-child { border-bottom: none; } .ds-row-selected { background: #FAF9F6; } .ds-row:focus-visible { outline: 2px solid #111111; outline-offset: -2px; } .ds-row-name { min-width: 0; overflow-wrap: anywhere; } .ds-check { width: 18px; height: 18px; border: 2px solid #6E6D6A; border-radius: 4px; flex-shrink: 0; } .ds-check-on { background: #111111; border-color: #111111; }"
+    },
+    {
+      "name": "Confirm Sheet",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "Hoja inferior: título serif, labio 16px, sombra hacia arriba.",
+      "html": "<div class=\"ds-sheet\" role=\"alertdialog\" aria-labelledby=\"ds-sheet-title\"><h2 class=\"ds-sheet-title\" id=\"ds-sheet-title\">¿Borrar producto?</h2><p class=\"ds-sheet-copy\">Se quita de la despensa. No hay deshacer.</p><div class=\"ds-sheet-actions\"><button class=\"ds-btn-secondary\" type=\"button\">Cancelar</button><button class=\"ds-btn-danger\" type=\"button\">Borrar</button></div></div>",
+      "css": ".ds-sheet { background: #FFFFFF; color: #111111; border: 1px solid #EAEAEA; border-radius: 16px 16px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); padding: 24px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-sheet-title { font-family: Newsreader, Georgia, serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 4px; overflow-wrap: anywhere; } .ds-sheet-copy { margin: 0 0 16px; font-size: 0.85rem; line-height: 1.45; color: #5C5B58; } .ds-sheet-actions { display: flex; gap: 12px; } .ds-sheet-actions > button { flex: 1; } .ds-btn-secondary { background: #FFFFFF; color: #111111; border: 1px solid #EAEAEA; border-radius: 6px; padding: 12px 16px; min-height: 48px; font-weight: 500; cursor: pointer; } .ds-btn-secondary:hover { background: #FAF9F6; } .ds-btn-secondary:focus-visible, .ds-btn-danger:focus-visible { outline: 2px solid #111111; outline-offset: 2px; } .ds-btn-danger { background: #9F2F2D; color: #FFFFFF; border: none; border-radius: 6px; padding: 12px 16px; min-height: 48px; font-weight: 500; cursor: pointer; } .ds-btn-danger:hover { filter: brightness(0.95); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La despensa editorial",
+    "overview": "KMarket se lee como una revista de cocina impresa en papel cálido, no como un dashboard de inventario. El visitante está en el pasillo: una columna estrecha, títulos en Newsreader, cuerpo en sans de sistema, y un CTA de tinta negra. Los pasteles existen como recortes de revista (badges, selección, mensajes), nunca como la voz principal.\n\nLa densidad es de herramienta Operate: scanable, pocos pesos visuales, chrome mínimo. El carácter es refinado y contenido — radius pequeño, hover tonal, press scale(0.98). No hay gradientes, no hay sombras de tarjeta, no hay acento saturado de marca. El negro (tinta) es el único gesto de autoridad.\n\nRechazos confirmados por el código: Material elevation, paleta de producto “tech” (azules de SaaS), botones pastel, layouts anchos de consola.",
+    "keyCharacteristics": [
+      "Columna única de 600px sobre papel #FBFBFA",
+      "Newsreader solo en títulos, marca y hojas; SF Pro / sistema en UI",
+      "Botón primario = tinta sobre blanco, no color de acento",
+      "Pasteles emparejados fondo+tinta, solo en chips y estados semánticos",
+      "Plano: borde 1px; profundidad por capas tonales",
+      "Tema oscuro invertido: papel #141413, tinta #F5F4F1 (mismas roles, otros hex)"
+    ],
+    "rules": [
+      { "name": "The Tinta Rule", "body": "El único relleno de acción primaria es tinta. Los pasteles no pintan botones, fondos de pantalla ni navegación.", "section": "colors" },
+      { "name": "The Pair Rule", "body": "Un pastel de fondo siempre viaja con su tinta emparejada. No mezclar amarillo-fondo con verde-tinta.", "section": "colors" },
+      { "name": "The Serif Title Rule", "body": "Newsreader (.font-serif) solo en títulos, wordmark y sheets. Nunca en botones, campos, nav ni badges.", "section": "typography" },
+      { "name": "The Measure Rule", "body": "El cuerpo no se estira: contenedor 600px, vacíos ~28ch, nombres de producto con overflow-wrap: anywhere.", "section": "typography" },
+      { "name": "The Aisle Rule", "body": "Nada de producto usa más de 600px de medida. Si una pantalla pide “desktop wide”, es un error de sistema, no una excepción.", "section": "elevation" },
+      { "name": "The Flat-By-Default Rule", "body": "En reposo, cero sombra de tarjeta. La profundidad es tonal (elevado) o un hairline. La sombra aparece cuando un sheet se levanta del pasillo.", "section": "elevation" },
+      { "name": "The Small Radius Rule", "body": "Controles a 6px. 16px no es “card grande”; es el gesto del sheet.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar tokens --km-* (o estos nombres de frontmatter) en lugar de hex sueltos.",
+      "Do poner Newsreader solo en títulos y aplicar .font-serif.",
+      "Do mantener la columna a 600px y objetivos táctiles ≥ 44px.",
+      "Do emparejar cada pastel (fondo + tinta) y reservarlos a badges, selección y semántica.",
+      "Do nombrar botones icono con .sr-only; aria-label estático vale en <a> y <nav>.",
+      "Do respetar prefers-reduced-motion: sin view-transition names ni blur de página."
+    ],
+    "donts": [
+      "Don't pintar el CTA de verde, azul o cualquier pastel.",
+      "Don't añadir box-shadow a cards, header o nav.",
+      "Don't introducir una segunda columna de contenido o un max-width de “dashboard”.",
+      "Don't usar [aria-label] / [attr.aria-label] en <button> o mat-icon-button (NG8002).",
+      "Don't anidar un checkbox interactivo dentro de una fila role=\"button\".",
+      "Don't duplicar <main>: el wizard usa un div, no un landmark extra.",
+      "Don't poner user-scalable=no en el viewport."
+    ]
+  }
+}

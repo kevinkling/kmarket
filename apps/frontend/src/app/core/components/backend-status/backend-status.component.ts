@@ -13,11 +13,11 @@ import { ConnectivityService } from '../../services/connectivity.service';
       [class.is-online]="connectivity.status() === 'online'"
       [class.is-offline]="connectivity.status() === 'offline'"
       [class.is-checking]="connectivity.status() === 'checking'"
-      [attr.aria-label]="ariaLabel()"
       [title]="ariaLabel()"
       (click)="onRefresh()"
     >
       <mat-icon>{{ icon() }}</mat-icon>
+      <span class="sr-only">{{ ariaLabel() }}</span>
       <span class="backend-status-text">{{ shortLabel() }}</span>
     </button>
   `,
@@ -26,8 +26,9 @@ import { ConnectivityService } from '../../services/connectivity.service';
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      height: 28px;
-      padding: 0 8px 0 6px;
+      min-height: 32px;
+      height: 32px;
+      padding: 0 10px 0 6px;
       border: var(--km-border);
       border-radius: var(--km-radius-pill);
       background: var(--km-pastel-gray-bg);
@@ -38,6 +39,10 @@ import { ConnectivityService } from '../../services/connectivity.service';
       text-transform: uppercase;
       cursor: pointer;
       line-height: 1;
+    }
+    .backend-status:focus-visible {
+      outline: 2px solid var(--km-text-primary);
+      outline-offset: 2px;
     }
     .backend-status:active {
       transform: scale(0.98);

@@ -1,7 +1,17 @@
 <div class="login-page">
+  <button
+    mat-icon-button
+    type="button"
+    class="theme-toggle"
+    (click)="theme.toggle()"
+  >
+    <mat-icon>{{ theme.mode() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    <span class="sr-only">{{ theme.mode() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo nocturno' }}</span>
+  </button>
+
   <div class="login-card km-card">
     <div class="brand">
-      <img src="icons/logo.svg" alt="KMarket" width="56" height="56">
+      <img src="icons/logo.svg" alt="" width="56" height="56">
       <h1 class="font-serif">KMarket</h1>
       <p>Entrá con tu cuenta familiar para sincronizar la despensa.</p>
       <div class="status-row">
@@ -9,26 +19,47 @@
       </div>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
       <label class="field">
         <span>Email</span>
-        <input type="email" formControlName="email" autocomplete="username" placeholder="familia@ejemplo.com">
+        <input
+          type="email"
+          formControlName="email"
+          name="email"
+          autocomplete="username"
+          placeholder="familia@ejemplo.com"
+          maxlength="120"
+          [attr.aria-invalid]="showEmailError()"
+        >
+        @if (showEmailError()) {
+          <span class="field-error" role="alert">Ingresá un email válido, como familia&#64;ejemplo.com.</span>
+        }
       </label>
 
       <label class="field">
         <span>Contraseña</span>
-        <input type="password" formControlName="password" autocomplete="current-password">
+        <input
+          type="password"
+          formControlName="password"
+          name="password"
+          autocomplete="current-password"
+          maxlength="128"
+          [attr.aria-invalid]="showPasswordError()"
+        >
+        @if (showPasswordError()) {
+          <span class="field-error" role="alert">Ingresá la contraseña de la cuenta familiar.</span>
+        }
       </label>
 
       @if (errorMessage()) {
-        <p class="error">{{ errorMessage() }}</p>
+        <p class="error" role="alert">{{ errorMessage() }}</p>
       }
 
       <button
         mat-flat-button
         class="km-btn-primary full-width"
         type="submit"
-        [disabled]="loginForm.invalid || submitting()"
+        [disabled]="submitting()"
       >
         <mat-icon>login</mat-icon>
         {{ submitting() ? 'Entrando…' : 'Entrar' }}

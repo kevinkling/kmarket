@@ -5,6 +5,14 @@
   justify-content: center;
   padding: 24px;
   background: var(--km-bg-canvas);
+  position: relative;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: var(--km-text-primary);
 }
 
 .login-card {
@@ -33,6 +41,7 @@
   margin: 0;
   color: var(--km-text-secondary);
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .status-row {
@@ -51,12 +60,23 @@
 }
 
 .field input {
+  width: 100%;
   border: var(--km-border);
   border-radius: var(--km-radius-sm);
   background: var(--km-bg-surface);
   color: var(--km-text-primary);
   padding: 12px 14px;
   font-size: 1rem;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+.field input::placeholder {
+  color: var(--km-text-muted);
+}
+
+.field input:disabled {
+  opacity: 0.55;
 }
 
 .field input:focus {
@@ -64,9 +84,17 @@
   outline-offset: 1px;
 }
 
+.field-error,
+.error {
+  margin: 0;
+  color: var(--km-pastel-red-text);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
 .error {
   margin: 0 0 16px;
-  color: var(--km-pastel-red-text);
   font-size: 0.9rem;
 }
 

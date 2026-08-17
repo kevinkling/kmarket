@@ -28,22 +28,25 @@ export interface ProductoSheetData {
     MatSlideToggleModule,
   ],
   template: `
-    <div class="sheet-form">
-      <div class="sheet-header">
-        <h2 class="font-serif sheet-title">
+    <div class="km-sheet-form">
+      <div class="km-sheet-header">
+        <h2 class="font-serif km-sheet-title">
           {{ data.producto ? 'Editar producto' : 'Nuevo producto' }}
         </h2>
-        <p class="sheet-subtitle">
+        <p class="km-sheet-subtitle">
           Configura el intervalo estimado de compra en días.
         </p>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="guardar()" class="form-body">
+      <form [formGroup]="form" (ngSubmit)="guardar()" class="km-sheet-body">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Nombre del producto</mat-label>
-          <input matInput formControlName="nombre" placeholder="Ej: Arroz, Detergente" />
+          <input matInput formControlName="nombre" placeholder="Ej: Arroz, Detergente" maxlength="80" />
           <mat-error *ngIf="form.get('nombre')?.hasError('required')">
             El nombre es obligatorio.
+          </mat-error>
+          <mat-error *ngIf="form.get('nombre')?.hasError('maxlength')">
+            Usá hasta 80 caracteres.
           </mat-error>
         </mat-form-field>
 
@@ -67,6 +70,7 @@ export interface ProductoSheetData {
             formControlName="intervaloDias"
             placeholder="Ej: 15, 30"
             min="1"
+            max="3650"
           />
           <mat-hint>Días estimados entre cada compra</mat-hint>
           <mat-error *ngIf="form.get('intervaloDias')?.hasError('required')">
@@ -75,18 +79,21 @@ export interface ProductoSheetData {
           <mat-error *ngIf="form.get('intervaloDias')?.hasError('min')">
             Debe ser mayor a 0.
           </mat-error>
+          <mat-error *ngIf="form.get('intervaloDias')?.hasError('max')">
+            El intervalo no puede superar 3650 días.
+          </mat-error>
         </mat-form-field>
 
-        <div class="toggle-row">
-          <span>Producto activo</span>
-          <mat-slide-toggle formControlName="activo"></mat-slide-toggle>
+        <div class="km-toggle-row">
+          <span id="producto-activo-label">Producto activo</span>
+          <mat-slide-toggle formControlName="activo" aria-labelledby="producto-activo-label"></mat-slide-toggle>
         </div>
 
-        <div class="sheet-actions">
+        <div class="km-sheet-actions">
           <button
             type="button"
             mat-stroked-button
-            class="km-btn-secondary flex-1"
+            class="km-btn-secondary km-flex-1"
             (click)="cancelar()"
           >
             Cancelar
@@ -94,7 +101,7 @@ export interface ProductoSheetData {
           <button
             type="submit"
             mat-flat-button
-            class="km-btn-primary flex-1"
+            class="km-btn-primary km-flex-1"
             [disabled]="form.invalid"
           >
             Guardar
@@ -104,47 +111,8 @@ export interface ProductoSheetData {
     </div>
   `,
   styles: [`
-    .sheet-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .sheet-header {
-      margin-bottom: 4px;
-    }
-    .sheet-title {
-      font-size: 1.5rem;
-      margin: 0 0 4px 0;
-    }
-    .sheet-subtitle {
-      font-size: 0.85rem;
-      color: var(--km-text-secondary);
-      margin: 0;
-    }
-    .form-body {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
     .full-width {
       width: 100%;
-    }
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      font-size: 0.95rem;
-      color: var(--km-text-primary);
-    }
-    .sheet-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 16px;
-    }
-    .flex-1 {
-      flex: 1;
-      height: 44px;
     }
   `]
 })
@@ -160,9 +128,9 @@ export class ProductoFormSheetComponent implements OnInit {
   ngOnInit(): void {
     const prod = this.data.producto;
     this.form = this.fb.group({
-      nombre: [prod ? prod.nombre : '', [Validators.required]],
+      nombre: [prod ? prod.nombre : '', [Validators.required, Validators.maxLength(80)]],
       categoriaId: [prod ? prod.categoriaId : (this.data.categorias[0]?.id || ''), [Validators.required]],
-      intervaloDias: [prod ? prod.intervaloDias : 30, [Validators.required, Validators.min(1)]],
+      intervaloDias: [prod ? prod.intervaloDias : 30, [Validators.required, Validators.min(1), Validators.max(3650)]],
       activo: [prod ? prod.activo : true],
     });
   }

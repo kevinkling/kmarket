@@ -26,22 +26,25 @@ export interface CategoriaSheetData {
     MatSlideToggleModule,
   ],
   template: `
-    <div class="sheet-form">
-      <div class="sheet-header">
-        <h2 class="font-serif sheet-title">
+    <div class="km-sheet-form">
+      <div class="km-sheet-header">
+        <h2 class="font-serif km-sheet-title">
           {{ data.categoria ? 'Editar categoría' : 'Nueva categoría' }}
         </h2>
-        <p class="sheet-subtitle">
+        <p class="km-sheet-subtitle">
           Organiza las secciones del recorrido de compra.
         </p>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="guardar()" class="form-body">
+      <form [formGroup]="form" (ngSubmit)="guardar()" class="km-sheet-body">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Nombre de la categoría</mat-label>
-          <input matInput formControlName="nombre" placeholder="Ej: Bebidas, Mascotas" />
+          <input matInput formControlName="nombre" placeholder="Ej: Bebidas, Mascotas" maxlength="80" />
           <mat-error *ngIf="form.get('nombre')?.hasError('required')">
             El nombre es obligatorio.
+          </mat-error>
+          <mat-error *ngIf="form.get('nombre')?.hasError('maxlength')">
+            Usá hasta 80 caracteres.
           </mat-error>
         </mat-form-field>
 
@@ -60,16 +63,16 @@ export interface CategoriaSheetData {
           </mat-error>
         </mat-form-field>
 
-        <div class="toggle-row">
-          <span>Categoría activa</span>
-          <mat-slide-toggle formControlName="activa"></mat-slide-toggle>
+        <div class="km-toggle-row">
+          <span id="categoria-activa-label">Categoría activa</span>
+          <mat-slide-toggle formControlName="activa" aria-labelledby="categoria-activa-label"></mat-slide-toggle>
         </div>
 
-        <div class="sheet-actions">
+        <div class="km-sheet-actions">
           <button
             type="button"
             mat-stroked-button
-            class="km-btn-secondary flex-1"
+            class="km-btn-secondary km-flex-1"
             (click)="cancelar()"
           >
             Cancelar
@@ -77,7 +80,7 @@ export interface CategoriaSheetData {
           <button
             type="submit"
             mat-flat-button
-            class="km-btn-primary flex-1"
+            class="km-btn-primary km-flex-1"
             [disabled]="form.invalid"
           >
             Guardar
@@ -87,47 +90,8 @@ export interface CategoriaSheetData {
     </div>
   `,
   styles: [`
-    .sheet-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .sheet-header {
-      margin-bottom: 4px;
-    }
-    .sheet-title {
-      font-size: 1.5rem;
-      margin: 0 0 4px 0;
-    }
-    .sheet-subtitle {
-      font-size: 0.85rem;
-      color: var(--km-text-secondary);
-      margin: 0;
-    }
-    .form-body {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
     .full-width {
       width: 100%;
-    }
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      font-size: 0.95rem;
-      color: var(--km-text-primary);
-    }
-    .sheet-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 16px;
-    }
-    .flex-1 {
-      flex: 1;
-      height: 44px;
     }
   `]
 })
@@ -143,8 +107,8 @@ export class CategoriaFormSheetComponent implements OnInit {
   ngOnInit(): void {
     const cat = this.data.categoria;
     this.form = this.fb.group({
-      nombre: [cat ? cat.nombre : '', [Validators.required]],
-      orden: [cat ? cat.orden : (this.data.siguienteOrden || 1), [Validators.required, Validators.min(1)]],
+      nombre: [cat ? cat.nombre : '', [Validators.required, Validators.maxLength(80)]],
+      orden: [cat ? cat.orden : (this.data.siguienteOrden || 1), [Validators.required, Validators.min(1), Validators.max(999)]],
       activa: [cat ? cat.activa : true],
     });
   }
