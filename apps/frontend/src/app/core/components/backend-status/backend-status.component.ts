@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ConnectivityService } from '../../services/connectivity.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-backend-status',
@@ -78,11 +79,16 @@ import { ConnectivityService } from '../../services/connectivity.service';
 })
 export class BackendStatusComponent {
   readonly connectivity = inject(ConnectivityService);
+  private auth = inject(AuthService);
+
+  private syncing(): boolean {
+    return this.connectivity.status() === 'online' && this.auth.sessionValid();
+  }
 
   icon(): string {
     switch (this.connectivity.status()) {
       case 'online':
-        return 'cloud';
+        return this.syncing() ? 'cloud_sync' : 'cloud';
       case 'offline':
         return 'cloud_off';
       default:
@@ -93,7 +99,7 @@ export class BackendStatusComponent {
   shortLabel(): string {
     switch (this.connectivity.status()) {
       case 'online':
-        return 'Sync';
+        return this.syncing() ? 'Sync' : 'Online';
       case 'offline':
         return 'Local';
       default:
@@ -104,7 +110,9 @@ export class BackendStatusComponent {
   ariaLabel(): string {
     switch (this.connectivity.status()) {
       case 'online':
-        return 'Conectado al servidor. Tocá para comprobar de nuevo.';
+        return this.syncing()
+          ? 'Sincronizando con el servidor. Tocá para comprobar de nuevo.'
+          : 'Servidor disponible. Entrá con la cuenta familiar para sincronizar. Tocá para comprobar de nuevo.';
       case 'offline':
         return 'Sin servidor. Los datos quedan en este dispositivo. Tocá para reintentar.';
       default:

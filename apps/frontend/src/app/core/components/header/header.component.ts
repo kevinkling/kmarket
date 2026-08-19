@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -45,11 +45,19 @@ import { BackendStatusComponent } from '../backend-status/backend-status.compone
             <mat-icon>{{ theme.mode() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
             <span class="sr-only">{{ theme.mode() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo nocturno' }}</span>
           </button>
+          <a
+            mat-icon-button
+            routerLink="/login"
+            *ngIf="!auth.sessionValid()"
+          >
+            <mat-icon>login</mat-icon>
+            <span class="sr-only">Sincronizar con la cuenta familiar</span>
+          </a>
           <button
             mat-icon-button
             type="button"
             (click)="logout()"
-            *ngIf="auth.isAuthenticated()"
+            *ngIf="auth.sessionValid()"
           >
             <mat-icon>logout</mat-icon>
             <span class="sr-only">Cerrar sesión</span>
@@ -130,7 +138,8 @@ import { BackendStatusComponent } from '../backend-status/backend-status.compone
   `]
 })
 export class HeaderComponent {
-  constructor(public theme: ThemeService, public auth: AuthService) {}
+  readonly theme = inject(ThemeService);
+  readonly auth = inject(AuthService);
 
   logout(): void {
     this.auth.logout();

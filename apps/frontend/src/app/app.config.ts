@@ -18,15 +18,18 @@ import {
 import { ImportarSeedInicialUseCase } from './application';
 import { SyncService } from './infrastructure/sync/sync.service';
 import { ConnectivityService } from './core/services/connectivity.service';
+import { AuthService } from './core/services/auth.service';
 
 export function initializeApp(
   seedUseCase: ImportarSeedInicialUseCase,
   syncService: SyncService,
   connectivity: ConnectivityService,
+  authService: AuthService,
 ) {
   return async () => {
     await seedUseCase.ejecutar();
-    void connectivity.check();
+    await connectivity.check();
+    await authService.refreshIfNeeded();
     syncService.init();
   };
 }
@@ -47,7 +50,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
-      deps: [ImportarSeedInicialUseCase, SyncService, ConnectivityService],
+      deps: [ImportarSeedInicialUseCase, SyncService, ConnectivityService, AuthService],
       multi: true,
     },
   ],

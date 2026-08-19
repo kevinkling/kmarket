@@ -13,7 +13,7 @@
     <div class="brand">
       <img src="icons/logo.svg" alt="" width="56" height="56">
       <h1 class="font-serif">KMarket</h1>
-      <p>Entrá con tu cuenta familiar para sincronizar la despensa.</p>
+      <p>La despensa vive en este dispositivo. La cuenta familiar solo hace falta para sincronizar.</p>
       <div class="status-row">
         <app-backend-status></app-backend-status>
       </div>
@@ -62,8 +62,17 @@
         [disabled]="submitting()"
       >
         <mat-icon>login</mat-icon>
-        {{ submitting() ? 'Entrando…' : 'Entrar' }}
+        {{ submitting() ? 'Entrando…' : 'Sincronizar con la familia' }}
       </button>
     </form>
+
+    <button
+      mat-button
+      type="button"
+      class="skip-local"
+      (click)="continueLocal()"
+    >
+      Continuar en este dispositivo
+    </button>
   </div>
 </div>

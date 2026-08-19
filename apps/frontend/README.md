@@ -1,6 +1,8 @@
 # KMarket frontend
 
-PWA Angular offline-first. Persistencia local con Dexie; sync con PocketBase cuando hay sesión.
+PWA Angular offline-first. Persistencia local con Dexie; PocketBase es opcional para sync familiar.
+
+La app se abre en modo local. `/login` sincroniza con la cuenta de la familia cuando el backend está disponible.
 
 ## Desarrollo
 
@@ -15,7 +17,7 @@ App local: http://localhost:4200/
 
 Login de la PWA: `kevin@kmarket.com` / `kmarket123`
 
-El backend tiene que estar en http://localhost:8090 (ver el README raíz).
+El backend hace falta para sincronizar, no para usar la despensa en este dispositivo. PocketBase local: http://localhost:8090 (ver el README raíz).
 
 ## Deploy (GitHub Pages)
 

@@ -60,7 +60,7 @@ docker compose up --build
 pnpm dev:frontend
 ```
 
-Abrí [http://localhost:4200/](http://localhost:4200/) e iniciá sesión con `kevin@kmarket.com` / `kmarket123`.
+Abrí [http://localhost:4200/](http://localhost:4200/). La despensa se usa sin cuenta. Para sincronizar, iniciá sesión con `kevin@kmarket.com` / `kmarket123`.
 
 ### 4. Probar sync
 
@@ -71,9 +71,10 @@ Entrá en un navegador, marcá un producto, y en una ventana privada usá la mis
 **Sí podés seguir usando la app**, con matices:
 
 - Dexie guarda todo en el navegador. Productos, categorías y la lista de compra siguen ahí.
-- Si ya iniciaste sesión antes, la PWA instalada o abierta funciona offline: marcar comprar, editar, etc.
-- Cuando PocketBase vuelva, se sincroniza solo (evento `online` + login vigente).
-- **No** funciona sin backend: el primer login, un dispositivo nuevo, o si expiró la sesión.
+- No hace falta cuenta para usar este dispositivo: el login es solo para sync familiar.
+- Si ya hay sesión, la PWA refresca el JWT cuando hay red (token de 90 días).
+- Cuando PocketBase vuelva y haya sesión, se sincroniza solo.
+- **Sí hace falta backend:** el primer login de la cuenta familiar, o si la sesión se invalidó y querés volver a sincronizar.
 
 Es offline-first: PocketBase es la fuente compartida entre dispositivos, no un requisito para cada toque.
 

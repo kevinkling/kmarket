@@ -2,6 +2,7 @@ import { Injectable, NgZone, effect } from '@angular/core';
 import { RecordModel, ClientResponseError } from 'pocketbase';
 import { AuthService } from '../../core/services/auth.service';
 import { ConnectivityService } from '../../core/services/connectivity.service';
+import { SeedMetaRepository } from '../../domain';
 import {
   CategoriaTable,
   EstadoProductoTable,
@@ -10,16 +11,24 @@ import {
 } from '../persistence/kmarket.db';
 import { pb } from '../pocketbase/pocketbase-client';
 
+type SyncCollection = 'categorias' | 'productos' | 'estados_producto';
+
 @Injectable({ providedIn: 'root' })
 export class SyncService {
   private applyingRemote = false;
   private hooksInstalled = false;
   private unsubscribes: Array<() => Promise<void>> = [];
+  private remoteHadRecords: Record<SyncCollection, boolean> = {
+    categorias: false,
+    productos: false,
+    estados_producto: false,
+  };
 
   constructor(
     private authService: AuthService,
     private ngZone: NgZone,
     private connectivity: ConnectivityService,
+    private seedMeta: SeedMetaRepository,
   ) {
     this.authService.currentUser.subscribe((user) => {
       if (user) {
@@ -155,6 +164,12 @@ export class SyncService {
         pb.collection('productos').getFullList(),
         pb.collection('estados_producto').getFullList(),
       ]);
+
+      this.remoteHadRecords = {
+        categorias: categorias.length > 0,
+        productos: productos.length > 0,
+        estados_producto: estados.length > 0,
+      };
 
       this.applyingRemote = true;
       try {
@@ -305,7 +320,7 @@ export class SyncService {
       nombre: categoria.nombre,
       orden: categoria.orden,
       activa: categoria.activa,
-    });
+    }, categoria.updatedAt);
   }
 
   private async pushProducto(producto: ProductoTable): Promise<void> {
@@ -314,7 +329,7 @@ export class SyncService {
       categoriaId: producto.categoriaId,
       intervaloDias: producto.intervaloDias,
       activo: producto.activo,
-    });
+    }, producto.updatedAt);
   }
 
   private async pushEstado(estado: EstadoProductoTable): Promise<void> {
@@ -322,19 +337,43 @@ export class SyncService {
       productoId: estado.productoId,
       ultimaCompra: estado.ultimaCompra,
       comprar: estado.comprar,
-    });
+    }, estado.updatedAt);
   }
 
-  private async upsert(collection: string, id: string, body: Record<string, unknown>): Promise<void> {
+  private async upsert(
+    collection: SyncCollection,
+    id: string,
+    body: Record<string, unknown>,
+    localUpdatedAt?: Date,
+  ): Promise<void> {
     try {
       await pb.collection(collection).update(id, body);
     } catch (error) {
       if (error instanceof ClientResponseError && error.status === 404) {
+        if (!(await this.shouldCreateMissingRemote(collection, localUpdatedAt))) {
+          return;
+        }
         await pb.collection(collection).create({ id, ...body });
         return;
       }
       throw error;
     }
+  }
+
+  private async shouldCreateMissingRemote(
+    collection: SyncCollection,
+    localUpdatedAt?: Date,
+  ): Promise<boolean> {
+    if (!this.remoteHadRecords[collection]) {
+      return true;
+    }
+
+    const seedAt = await this.seedMeta.obtenerFechaImportacion();
+    if (!seedAt || !localUpdatedAt) {
+      return true;
+    }
+
+    return localUpdatedAt.getTime() > seedAt.getTime() + 1000;
   }
 
   private async deleteRemote(collection: string, id: string): Promise<void> {

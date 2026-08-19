@@ -62,4 +62,4 @@ PocketBase suele permitir cualquier origen; si el login falla por CORS, revisá 
 | Docker (`kmarket_pocketbase`) | API y sync |
 | `cloudflared tunnel run` | HTTPS público hacia tu PC |
 
-Si se apaga alguno de los dos, la familia sigue con los datos locales ya sincronizados; no hay login ni sync nuevo hasta que vuelvan.
+Si se apaga alguno de los dos, la familia sigue con los datos locales; el login nuevo y el sync esperan a que vuelvan. La PWA se puede usar sin cuenta en cada dispositivo.

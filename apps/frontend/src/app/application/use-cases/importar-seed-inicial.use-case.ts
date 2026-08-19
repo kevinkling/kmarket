@@ -27,6 +27,7 @@ export class ImportarSeedInicialUseCase {
 
     const categoriasMap = new Map<string, number>();
 
+    const importadoEn = new Date();
     const categorias: Categoria[] = CATEGORIAS_SEED.map((c) => {
       categoriasMap.set(c.id, c.intervaloPorDefecto);
       return {
@@ -34,6 +35,7 @@ export class ImportarSeedInicialUseCase {
         nombre: c.nombre,
         orden: c.orden,
         activa: true,
+        updatedAt: importadoEn,
       };
     });
 
@@ -43,18 +45,20 @@ export class ImportarSeedInicialUseCase {
       categoriaId: p.categoria,
       intervaloDias: categoriasMap.get(p.categoria) ?? 30,
       activo: true,
+      updatedAt: importadoEn,
     }));
 
     const estados: EstadoProducto[] = PRODUCTOS_SEED.map((p) => ({
       productoId: p.id,
       ultimaCompra: null,
       comprar: false,
+      updatedAt: importadoEn,
     }));
 
     await this.categoriaRepo.guardarTodas(categorias);
     await this.productoRepo.guardarTodos(productos);
     await this.estadoRepo.guardarTodos(estados);
-    await this.seedMetaRepo.marcarImportado();
+    await this.seedMetaRepo.marcarImportado(importadoEn);
 
     return true;
   }

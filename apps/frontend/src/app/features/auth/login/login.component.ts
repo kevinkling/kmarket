@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,6 +19,7 @@ import { BackendStatusComponent } from '../../../core/components/backend-status/
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private router = inject(Router);
   readonly connectivity = inject(ConnectivityService);
   readonly theme = inject(ThemeService);
 
@@ -65,5 +67,9 @@ export class LoginComponent {
       this.loginForm.enable();
       this.submitting.set(false);
     }
+  }
+
+  continueLocal(): void {
+    this.router.navigate(['/']);
   }
 }

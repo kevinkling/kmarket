@@ -101,3 +101,12 @@
 .full-width {
   width: 100%;
 }
+
+.skip-local {
+  display: flex;
+  width: 100%;
+  margin-top: 12px;
+  min-height: 44px;
+  color: var(--km-text-secondary);
+  font-weight: 500;
+}

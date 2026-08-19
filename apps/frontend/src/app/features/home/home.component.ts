@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +8,7 @@ import {
   ObtenerSugerenciasUseCase,
   ObtenerListaDeCompraUseCase,
 } from '../../application';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -20,6 +21,9 @@ import {
         <p class="description">
           KMarket no administra listas. Controla tu despensa y sugiere lo que necesitas reponer.
         </p>
+        <a *ngIf="!auth.sessionValid()" routerLink="/login" class="local-hint">
+          Esta despensa queda en este dispositivo. Entrá para sincronizar con la familia.
+        </a>
       </section>
 
       <div class="km-card status-card" [attr.aria-busy]="cargando">
@@ -112,6 +116,15 @@ import {
       line-height: 1.5;
       margin: 0;
       overflow-wrap: anywhere;
+    }
+    .local-hint {
+      display: block;
+      margin-top: 10px;
+      color: var(--km-text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.45;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     .status-card {
@@ -227,6 +240,7 @@ export class HomeComponent implements OnInit {
   sugeridosCount = 0;
   enProgresoCount = 0;
   cargando = true;
+  readonly auth = inject(AuthService);
 
   constructor(
     private router: Router,
