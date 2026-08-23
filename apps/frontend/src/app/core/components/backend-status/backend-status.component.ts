@@ -17,29 +17,23 @@ import { AuthService } from '../../services/auth.service';
       [title]="ariaLabel()"
       (click)="onRefresh()"
     >
-      <mat-icon>{{ icon() }}</mat-icon>
+      <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
       <span class="sr-only">{{ ariaLabel() }}</span>
-      <span class="backend-status-text">{{ shortLabel() }}</span>
     </button>
   `,
   styles: [`
     .backend-status {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      min-height: 32px;
-      height: 32px;
-      padding: 0 10px 0 6px;
-      border: var(--km-border);
-      border-radius: var(--km-radius-pill);
-      background: var(--km-pastel-gray-bg);
-      color: var(--km-pastel-gray-text);
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 0;
+      border-radius: var(--km-radius-sm);
+      background: transparent;
+      color: var(--km-text-muted);
       cursor: pointer;
-      line-height: 1;
     }
     .backend-status:focus-visible {
       outline: 2px solid var(--km-text-primary);
@@ -49,27 +43,22 @@ import { AuthService } from '../../services/auth.service';
       transform: scale(0.98);
     }
     .backend-status.is-online {
-      background: var(--km-pastel-green-bg);
       color: var(--km-pastel-green-text);
     }
     .backend-status.is-offline {
-      background: var(--km-pastel-yellow-bg);
       color: var(--km-pastel-yellow-text);
     }
     .backend-status mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
     }
     .backend-status.is-checking mat-icon {
       animation: spin 1.2s linear infinite;
     }
-    .backend-status-text {
-      display: none;
-    }
-    @media (min-width: 400px) {
-      .backend-status-text {
-        display: inline;
+    @media (prefers-reduced-motion: reduce) {
+      .backend-status.is-checking mat-icon {
+        animation: none;
       }
     }
     @keyframes spin {
@@ -93,17 +82,6 @@ export class BackendStatusComponent {
         return 'cloud_off';
       default:
         return 'sync';
-    }
-  }
-
-  shortLabel(): string {
-    switch (this.connectivity.status()) {
-      case 'online':
-        return this.syncing() ? 'Sync' : 'Online';
-      case 'offline':
-        return 'Local';
-      default:
-        return '…';
     }
   }
 

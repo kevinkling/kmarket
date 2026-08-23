@@ -283,7 +283,9 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       padding-top: env(safe-area-inset-top, 0px);
     }
     .wizard-header-content {
-      max-width: 600px;
+      max-width: 880px;
+      width: 100%;
+      box-sizing: border-box;
       margin: 0 auto;
       height: 56px;
       display: flex;
@@ -311,8 +313,11 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
 
     .wizard-body {
       flex: 1;
+      width: 100%;
+      box-sizing: border-box;
       padding-top: 20px;
-      padding-inline: 8px;
+      padding-inline: 12px;
+      max-width: 880px;
     }
 
     .step-card {
@@ -521,7 +526,10 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       display: flex;
       flex-direction: column;
       gap: 8px;
+      width: 100%;
+      box-sizing: border-box;
       padding: 0;
+      max-width: 880px;
     }
     .footer-actions {
       display: flex;

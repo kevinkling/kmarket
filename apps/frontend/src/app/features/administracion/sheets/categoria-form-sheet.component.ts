@@ -5,7 +5,6 @@ import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bott
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Categoria } from '../../../domain';
 
 export interface CategoriaSheetData {
@@ -23,7 +22,6 @@ export interface CategoriaSheetData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSlideToggleModule,
   ],
   template: `
     <div class="km-sheet-form">
@@ -63,10 +61,13 @@ export interface CategoriaSheetData {
           </mat-error>
         </mat-form-field>
 
-        <div class="km-toggle-row">
-          <span id="categoria-activa-label">Categoría activa</span>
-          <mat-slide-toggle formControlName="activa" aria-labelledby="categoria-activa-label"></mat-slide-toggle>
-        </div>
+        <label class="km-toggle-row">
+          <span>Categoría activa</span>
+          <span class="km-check">
+            <input type="checkbox" formControlName="activa" class="sr-only" />
+            <span class="check-visual" aria-hidden="true"></span>
+          </span>
+        </label>
 
         <div class="km-sheet-actions">
           <button

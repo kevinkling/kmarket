@@ -6,7 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Categoria, Producto } from '../../../domain';
 
 export interface ProductoSheetData {
@@ -25,7 +24,6 @@ export interface ProductoSheetData {
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatSlideToggleModule,
   ],
   template: `
     <div class="km-sheet-form">
@@ -84,10 +82,13 @@ export interface ProductoSheetData {
           </mat-error>
         </mat-form-field>
 
-        <div class="km-toggle-row">
-          <span id="producto-activo-label">Producto activo</span>
-          <mat-slide-toggle formControlName="activo" aria-labelledby="producto-activo-label"></mat-slide-toggle>
-        </div>
+        <label class="km-toggle-row">
+          <span>Producto activo</span>
+          <span class="km-check">
+            <input type="checkbox" formControlName="activo" class="sr-only" />
+            <span class="check-visual" aria-hidden="true"></span>
+          </span>
+        </label>
 
         <div class="km-sheet-actions">
           <button
