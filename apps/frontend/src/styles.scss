@@ -361,6 +361,10 @@ html:active-view-transition .fade-in {
   color: var(--km-text-primary) !important;
 }
 
+.mat-bottom-sheet-container.km-producto-sheet {
+  overflow: visible !important;
+}
+
 .km-badge {
   display: inline-flex;
   align-items: center;

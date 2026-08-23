@@ -415,9 +415,11 @@ export class AdministracionComponent implements OnInit {
 
   abrirModalProducto(producto?: Producto): void {
     const sheetRef = this.bottomSheet.open(ProductoFormSheetComponent, {
+      panelClass: 'km-producto-sheet',
       data: {
         producto,
         categorias: this.categorias,
+        productos: this.productos,
       },
     });
 
