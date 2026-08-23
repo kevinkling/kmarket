@@ -436,6 +436,10 @@ html:active-view-transition .fade-in {
     border-bottom: none;
   }
 
+  &:hover {
+    background-color: var(--km-bg-elevated);
+  }
+
   &.is-selected {
     background-color: var(--km-bg-elevated);
   }
@@ -471,7 +475,16 @@ html:active-view-transition .fade-in {
 .km-sheet-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+
+  .mat-mdc-form-field {
+    display: block;
+    width: 100%;
+  }
+
+  .mat-mdc-form-field + .mat-mdc-form-field {
+    margin-top: 8px;
+  }
 }
 
 .km-sheet-actions {
@@ -514,6 +527,11 @@ html:active-view-transition .fade-in {
   line-height: 1.45;
   max-width: 28ch;
   overflow-wrap: anywhere;
+}
+
+.km-empty .km-btn-primary,
+.km-empty .km-btn-secondary {
+  margin-top: 6px;
 }
 
 .km-loading {

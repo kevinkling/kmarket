@@ -36,7 +36,7 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
     <div class="km-container page-admin">
       <div class="admin-header">
         <h1 class="font-serif admin-title">Administración</h1>
-        <p class="admin-subtitle">Gestiona los productos y categorías de tu despensa</p>
+        <p class="admin-subtitle">Gestioná productos y categorías de la despensa</p>
       </div>
 
       <p class="km-loading" *ngIf="cargando">Cargando catálogo…</p>
@@ -52,7 +52,7 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
           <div class="tab-content">
             <!-- Toolbar & Filters -->
             <div class="admin-toolbar">
-              <mat-form-field appearance="outline" class="search-field">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
                 <mat-label>Buscar producto...</mat-label>
                 <input
                   matInput
@@ -76,7 +76,7 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
 
             <!-- Filter Category Dropdown -->
             <div class="filter-row">
-              <mat-form-field appearance="outline" class="full-width">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
                 <mat-label>Filtrar por categoría</mat-label>
                 <mat-select [(ngModel)]="categoriaFiltroId" (ngModelChange)="filtrarProductos()">
                   <mat-option value="todas">Todas las categorías</mat-option>
@@ -94,7 +94,7 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
                 class="km-list-item admin-item"
                 [class.is-disabled]="!prod.activo"
               >
-                <div class="item-main">
+                <button type="button" class="item-main" (click)="abrirModalProducto(prod)">
                   <div class="item-title-row">
                     <span class="item-title">{{ prod.nombre }}</span>
                     <span
@@ -110,7 +110,7 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
                     <span class="dot">•</span>
                     <span>Cada {{ prod.intervaloDias }} días</span>
                   </div>
-                </div>
+                </button>
 
                 <div class="item-actions">
                   <button mat-icon-button type="button" (click)="abrirModalProducto(prod)">
@@ -130,9 +130,18 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
               </div>
 
               <div *ngIf="productosFiltrados.length === 0" class="empty-state km-empty">
-                <mat-icon class="empty-icon">search_off</mat-icon>
+                <mat-icon class="empty-icon" *ngIf="productos.length > 0">search_off</mat-icon>
                 <p *ngIf="productos.length === 0">Todavía no hay productos. Creá el primero para armar la despensa.</p>
                 <p *ngIf="productos.length > 0">No hay productos que coincidan con la búsqueda o el filtro.</p>
+                <button
+                  *ngIf="productos.length === 0"
+                  mat-flat-button
+                  type="button"
+                  class="km-btn-primary"
+                  (click)="abrirModalProducto()"
+                >
+                  Nuevo producto
+                </button>
               </div>
             </div>
           </div>
@@ -159,7 +168,7 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
                 class="km-list-item admin-item"
                 [class.is-disabled]="!cat.activa"
               >
-                <div class="item-main">
+                <button type="button" class="item-main" (click)="abrirModalCategoria(cat)">
                   <div class="item-title-row">
                     <span class="item-title">{{ cat.nombre }}</span>
                     <span
@@ -173,7 +182,7 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
                   <div class="item-meta">
                     <span>Orden en recorrido: #{{ cat.orden }}</span>
                   </div>
-                </div>
+                </button>
 
                 <div class="item-actions">
                   <button mat-icon-button type="button" (click)="abrirModalCategoria(cat)">
@@ -194,6 +203,14 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
 
               <div *ngIf="categorias.length === 0" class="empty-state km-empty">
                 <p>Todavía no hay categorías. Creá la primera para organizar el recorrido.</p>
+                <button
+                  mat-flat-button
+                  type="button"
+                  class="km-btn-primary"
+                  (click)="abrirModalCategoria()"
+                >
+                  Nueva categoría
+                </button>
               </div>
             </div>
           </div>
@@ -236,7 +253,6 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
     .search-field {
       flex: 1;
       min-width: 0;
-      margin-bottom: -1.25em;
     }
     .add-btn {
       height: 48px;
@@ -253,10 +269,8 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
     }
 
     .filter-row {
-      margin-top: 4px;
       .full-width {
         width: 100%;
-        margin-bottom: -1.25em;
       }
     }
 
@@ -267,8 +281,6 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
     }
 
     .admin-item {
-      cursor: default;
-
       &.is-disabled {
         opacity: 0.55;
       }
@@ -286,6 +298,18 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
       gap: 4px;
       min-width: 0;
       flex: 1;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .item-main:focus-visible {
+      outline: 2px solid var(--km-text-primary);
+      outline-offset: 2px;
     }
     .item-title-row {
       display: flex;

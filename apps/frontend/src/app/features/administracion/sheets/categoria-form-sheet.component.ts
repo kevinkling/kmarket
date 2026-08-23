@@ -32,12 +32,12 @@ export interface CategoriaSheetData {
           {{ data.categoria ? 'Editar categoría' : 'Nueva categoría' }}
         </h2>
         <p class="km-sheet-subtitle">
-          Organiza las secciones del recorrido de compra.
+          Organizá las secciones del recorrido.
         </p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="guardar()" class="km-sheet-body">
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
           <mat-label>Nombre de la categoría</mat-label>
           <input matInput formControlName="nombre" placeholder="Ej: Bebidas, Mascotas" maxlength="80" />
           <mat-error *ngIf="form.get('nombre')?.hasError('required')">
@@ -48,7 +48,7 @@ export interface CategoriaSheetData {
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
           <mat-label>Orden de aparición</mat-label>
           <input
             matInput
@@ -90,8 +90,17 @@ export interface CategoriaSheetData {
     </div>
   `,
   styles: [`
+    .km-sheet-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
     .full-width {
+      display: block;
       width: 100%;
+    }
+    .full-width + .full-width {
+      margin-top: 24px;
     }
   `]
 })

@@ -51,7 +51,7 @@ export class LoginComponent {
     }
 
     if (!this.connectivity.connected()) {
-      this.errorMessage.set('El servidor no está disponible. El login necesita PocketBase en marcha. Podés reintentar cuando vuelva.');
+      this.errorMessage.set('El servidor no está disponible. Podés seguir en este dispositivo y sincronizar cuando vuelva.');
       return;
     }
 

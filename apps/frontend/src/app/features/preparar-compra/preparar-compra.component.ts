@@ -136,10 +136,9 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
 
           <div class="km-card list-card km-vt-sheet">
             <div
-              *ngFor="let item of categoriaActual.items"
+              *ngFor="let item of categoriaActual.items; trackBy: trackByProducto"
               class="km-list-item"
               [class.is-selected]="item.estado.comprar"
-              [class.is-settling]="settlingId === item.producto.id"
               role="button"
               tabindex="0"
               [attr.aria-pressed]="item.estado.comprar"
@@ -153,13 +152,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                   Nuevo / Sin compra
                 </span>
               </div>
-              <mat-checkbox
-                class="check-visual"
-                [checked]="item.estado.comprar"
-                [disableRipple]="true"
-                tabindex="-1"
-                aria-hidden="true"
-              ></mat-checkbox>
+              <div class="check-visual" [class.checked]="item.estado.comprar" aria-hidden="true"></div>
             </div>
 
             <div *ngIf="categoriaActual.items.length === 0" class="empty-cat">
@@ -186,10 +179,9 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
               <div class="km-divider"></div>
 
               <div
-                *ngFor="let item of catGroup.items"
+                *ngFor="let item of catGroup.items; trackBy: trackByProducto"
                 class="km-list-item"
                 [class.is-selected]="item.estado.comprar"
-                [class.is-settling]="settlingId === item.producto.id"
                 role="button"
                 tabindex="0"
                 [attr.aria-pressed]="item.estado.comprar"
@@ -198,13 +190,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                 (keydown.space)="$event.preventDefault(); toggleProducto(item)"
               >
                 <span class="item-name">{{ item.producto.nombre }}</span>
-                <mat-checkbox
-                  class="check-visual"
-                  [checked]="item.estado.comprar"
-                  [disableRipple]="true"
-                  tabindex="-1"
-                  aria-hidden="true"
-                ></mat-checkbox>
+                <div class="check-visual" [class.checked]="item.estado.comprar" aria-hidden="true"></div>
               </div>
             </div>
 
@@ -326,6 +312,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
     .wizard-body {
       flex: 1;
       padding-top: 20px;
+      padding-inline: 8px;
     }
 
     .step-card {
@@ -340,8 +327,8 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       width: 56px;
       height: 56px;
       border-radius: 12px;
-      background-color: var(--km-pastel-yellow-bg);
-      color: var(--km-pastel-yellow-text);
+      background-color: var(--km-pastel-gray-bg);
+      color: var(--km-text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -433,19 +420,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       padding: 0;
       overflow: hidden;
     }
-    .km-list-item.is-settling {
-      animation: km-settle 0.42s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    @keyframes km-settle {
-      0% { transform: scale(1); }
-      34% { transform: scale(0.985); }
-      100% { transform: scale(1); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .km-list-item.is-settling {
-        animation: none;
-      }
-    }
+    /* settling animation removed to make toggles feel instant on mobile */
     .item-info {
       display: flex;
       flex-direction: column;
@@ -458,13 +433,31 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       font-weight: 500;
       overflow-wrap: anywhere;
     }
+    /* Compact check visual used in the recorrido list to avoid MDC checkbox animations */
     .check-visual {
-      pointer-events: none;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--km-border-color);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
-
-      ::ng-deep .mdc-label {
-        display: none;
-      }
+      background: transparent;
+      transition: background-color 0.12s linear, border-color 0.12s linear;
+    }
+    .check-visual.checked {
+      background-color: var(--km-btn-primary-bg);
+      border-color: var(--km-btn-primary-bg);
+    }
+    .check-visual.checked::after {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid var(--km-btn-primary-text);
+      border-bottom: 2px solid var(--km-btn-primary-text);
+      transform: rotate(-45deg);
     }
     .empty-cat {
       padding: 24px;
@@ -580,7 +573,7 @@ export class PrepararCompraComponent implements OnInit {
   indiceCategoria = 0;
   procesando = false;
   cargando = true;
-  settlingId: string | null = null;
+  // settlingId removed: we render the check immediately and persist asynchronously
   confirmandoFinalizar = false;
   errorFinalizar = '';
 
@@ -708,14 +701,21 @@ export class PrepararCompraComponent implements OnInit {
 
   async toggleProducto(item: ProductoConEstado): Promise<void> {
     const nuevoValor = !item.estado.comprar;
+    // update UI immediately
     item.estado.comprar = nuevoValor;
-    this.settlingId = item.producto.id;
-    window.setTimeout(() => {
-      if (this.settlingId === item.producto.id) {
-        this.settlingId = null;
-      }
-    }, 420);
-    await this.alternarProductoUseCase.ejecutar(item.producto.id, nuevoValor);
+    this.cdr.detectChanges();
+    // persist in background without blocking the UI
+    void this.alternarProductoUseCase.ejecutar(item.producto.id, nuevoValor, item.estado.ultimaCompra).catch((err) => {
+      // on error, revert state and inform user minimally
+      console.error('Error guardando estado de producto', err);
+      item.estado.comprar = !nuevoValor;
+      this.cdr.detectChanges();
+      this.snackBar.open('No se pudo actualizar el producto. Intentá de nuevo.', 'Cerrar', { duration: 3000 });
+    });
+  }
+
+  trackByProducto(_: number, item: ProductoConEstado): string {
+    return item.producto.id;
   }
 
   pedirOConfirmarFinalizar(): void {

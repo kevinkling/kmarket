@@ -19,7 +19,7 @@ import { AuthService } from '../../core/services/auth.service';
       <section class="hero-section">
         <h1 class="title font-serif">Estado de la compra</h1>
         <p class="description">
-          KMarket no administra listas. Controla tu despensa y sugiere lo que necesitas reponer.
+          Controlá la despensa. Te sugerimos qué reponer, sin armar listas a mano.
         </p>
         <a *ngIf="!auth.sessionValid()" routerLink="/login" class="local-hint">
           Esta despensa queda en este dispositivo. Entrá para sincronizar con la familia.
@@ -40,16 +40,19 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
 
           <div class="status-body">
-            <div class="metric">
+            <div class="metric" *ngIf="sugeridosCount > 0">
               <span class="metric-number">{{ sugeridosCount }}</span>
               <span class="metric-label">
                 {{ sugeridosCount === 1 ? 'producto sugerido para reponer' : 'productos sugeridos para reponer' }}
               </span>
             </div>
+            <p class="status-copy" *ngIf="sugeridosCount === 0">
+              Nada que reponer por ahora. Prepará una compra si se te acabó algo.
+            </p>
 
             <div class="metric-secondary" *ngIf="enProgresoCount > 0">
               <span class="km-badge km-badge-blue">
-                {{ enProgresoCount }} marcados en la lista actual
+                {{ enProgresoCount === 1 ? '1 marcado en la compra actual' : enProgresoCount + ' marcados en la compra actual' }}
               </span>
             </div>
           </div>
@@ -78,7 +81,7 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
           <div class="card-info">
             <h2>Productos</h2>
-            <p>Administra el catálogo de tu despensa</p>
+            <p>Administrá el catálogo de tu despensa</p>
           </div>
           <mat-icon class="arrow" aria-hidden="true">chevron_right</mat-icon>
         </a>
@@ -89,7 +92,7 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
           <div class="card-info">
             <h2>Categorías</h2>
-            <p>Organiza las secciones del recorrido</p>
+            <p>Organizá las secciones del recorrido</p>
           </div>
           <mat-icon class="arrow" aria-hidden="true">chevron_right</mat-icon>
         </a>
@@ -164,6 +167,14 @@ import { AuthService } from '../../core/services/auth.service';
     .metric-label {
       font-size: 0.95rem;
       color: var(--km-text-secondary);
+      overflow-wrap: anywhere;
+    }
+    .status-copy {
+      margin: 0;
+      color: var(--km-text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      max-width: 32ch;
       overflow-wrap: anywhere;
     }
     .full-width {

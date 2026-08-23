@@ -34,12 +34,12 @@ export interface ProductoSheetData {
           {{ data.producto ? 'Editar producto' : 'Nuevo producto' }}
         </h2>
         <p class="km-sheet-subtitle">
-          Configura el intervalo estimado de compra en días.
+          Configurá cada cuántos días suele reponerse.
         </p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="guardar()" class="km-sheet-body">
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
           <mat-label>Nombre del producto</mat-label>
           <input matInput formControlName="nombre" placeholder="Ej: Arroz, Detergente" maxlength="80" />
           <mat-error *ngIf="form.get('nombre')?.hasError('required')">
@@ -50,7 +50,7 @@ export interface ProductoSheetData {
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
           <mat-label>Categoría</mat-label>
           <mat-select formControlName="categoriaId">
             <mat-option *ngFor="let cat of data.categorias" [value]="cat.id">
@@ -58,11 +58,11 @@ export interface ProductoSheetData {
             </mat-option>
           </mat-select>
           <mat-error *ngIf="form.get('categoriaId')?.hasError('required')">
-            Debes seleccionar una categoría.
+            Elegí una categoría.
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
           <mat-label>Intervalo de compra (días)</mat-label>
           <input
             matInput
@@ -111,8 +111,17 @@ export interface ProductoSheetData {
     </div>
   `,
   styles: [`
+    .km-sheet-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
     .full-width {
+      display: block;
       width: 100%;
+    }
+    .full-width + .full-width {
+      margin-top: 24px;
     }
   `]
 })
