@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://pb.kashflow.site',
+  apiUrl: 'https://pb.kevinkling.site',
 };
