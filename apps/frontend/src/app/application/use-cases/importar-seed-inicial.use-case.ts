@@ -52,6 +52,7 @@ export class ImportarSeedInicialUseCase {
       productoId: p.id,
       ultimaCompra: null,
       comprar: false,
+      recogido: false,
       updatedAt: importadoEn,
     }));
 

@@ -11,6 +11,7 @@ export class DexieEstadoProductoRepository implements EstadoProductoRepository {
       productoId: record.productoId,
       ultimaCompra: record.ultimaCompra ? new Date(record.ultimaCompra) : null,
       comprar: record.comprar,
+      recogido: Boolean(record.recogido),
       updatedAt: record.updatedAt,
     };
   }
@@ -21,6 +22,7 @@ export class DexieEstadoProductoRepository implements EstadoProductoRepository {
       productoId: r.productoId,
       ultimaCompra: r.ultimaCompra ? new Date(r.ultimaCompra) : null,
       comprar: r.comprar,
+      recogido: Boolean(r.recogido),
       updatedAt: r.updatedAt,
     }));
   }
@@ -30,6 +32,7 @@ export class DexieEstadoProductoRepository implements EstadoProductoRepository {
       productoId: estado.productoId,
       ultimaCompra: estado.ultimaCompra ? estado.ultimaCompra.toISOString() : null,
       comprar: estado.comprar,
+      recogido: Boolean(estado.recogido),
       updatedAt: new Date(),
     });
   }
@@ -39,6 +42,7 @@ export class DexieEstadoProductoRepository implements EstadoProductoRepository {
       productoId: e.productoId,
       ultimaCompra: e.ultimaCompra ? e.ultimaCompra.toISOString() : null,
       comprar: e.comprar,
+      recogido: Boolean(e.recogido),
       updatedAt: e.updatedAt ?? new Date(),
     }));
     await db.estadosProducto.bulkPut(tableRecords);

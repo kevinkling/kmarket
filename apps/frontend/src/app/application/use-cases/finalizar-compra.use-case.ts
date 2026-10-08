@@ -13,6 +13,7 @@ export class FinalizarCompraUseCase {
       productoId: e.productoId,
       ultimaCompra: fechaActual,
       comprar: false,
+      recogido: false,
     }));
 
     if (actualizados.length > 0) {

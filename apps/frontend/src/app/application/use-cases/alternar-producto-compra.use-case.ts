@@ -16,6 +16,7 @@ export class AlternarProductoEnCompraUseCase {
         productoId,
         ultimaCompra: ultimaCompra ?? null,
         comprar: nuevoEstadoComprar,
+        recogido: false,
       });
       return nuevoEstadoComprar;
     }
@@ -27,8 +28,23 @@ export class AlternarProductoEnCompraUseCase {
       productoId,
       ultimaCompra: estadoActual ? estadoActual.ultimaCompra : null,
       comprar: comprarVal,
+      recogido: false,
     });
 
     return comprarVal;
+  }
+
+  async ejecutarRecogido(
+    productoId: string,
+    recogido: boolean,
+    comprar: boolean,
+    ultimaCompra?: Date | null,
+  ): Promise<void> {
+    await this.estadoRepo.guardar({
+      productoId,
+      ultimaCompra: ultimaCompra ?? null,
+      comprar,
+      recogido,
+    });
   }
 }

@@ -21,6 +21,7 @@ export interface EstadoProductoTable {
   productoId: string;
   ultimaCompra: string | null;
   comprar: boolean;
+  recogido: boolean;
   updatedAt?: Date;
 }
 
@@ -59,6 +60,18 @@ export class KMarketDB extends Dexie {
         return tx.table('estadosProducto').toCollection().modify((estado) => {
           if (!estado.updatedAt) estado.updatedAt = new Date();
         });
+      });
+    });
+    this.version(3).stores({
+      categorias: '&id, nombre, orden, activa, updatedAt',
+      productos: '&id, nombre, categoriaId, intervaloDias, activo, updatedAt',
+      estadosProducto: '&productoId, ultimaCompra, comprar, recogido, updatedAt',
+      meta: '&key',
+    }).upgrade((tx) => {
+      return tx.table('estadosProducto').toCollection().modify((estado) => {
+        if (estado.recogido === undefined) {
+          estado.recogido = false;
+        }
       });
     });
   }

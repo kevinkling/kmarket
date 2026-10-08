@@ -12,6 +12,7 @@ export interface ProductoSheetData {
   producto?: Producto;
   categorias: Categoria[];
   productos: Producto[];
+  categoriaIdPreseleccionada?: string;
 }
 
 @Component({
@@ -233,7 +234,7 @@ export class ProductoFormSheetComponent implements OnInit {
         prod ? prod.nombre : '',
         [Validators.required, Validators.maxLength(80), this.nombreDuplicado],
       ],
-      categoriaId: [prod ? prod.categoriaId : (this.data.categorias[0]?.id || ''), [Validators.required]],
+      categoriaId: [prod ? prod.categoriaId : (this.data.categoriaIdPreseleccionada || this.data.categorias[0]?.id || ''), [Validators.required]],
       intervaloDias: [prod ? prod.intervaloDias : 30, [Validators.required, Validators.min(1), Validators.max(3650)]],
       activo: [prod ? prod.activo : true],
     });

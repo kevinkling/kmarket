@@ -39,6 +39,7 @@ export class IniciarPreparacionDeCompraUseCase {
         productoId: prod.id,
         ultimaCompra: estadoActual ? estadoActual.ultimaCompra : null,
         comprar: esSugerido,
+        recogido: false,
       });
     }
 

@@ -49,6 +49,7 @@ export class ObtenerListaDeCompraUseCase {
           productoId: prod.id,
           ultimaCompra: null,
           comprar: false,
+          recogido: false,
         };
 
         if (!soloSeleccionados || estado.comprar) {

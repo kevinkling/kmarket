@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -10,10 +11,17 @@ import {
   AlternarProductoEnCompraUseCase,
   CategoriaConProductos,
   FinalizarCompraUseCase,
+  GestionarCategoriasUseCase,
+  GestionarProductosUseCase,
   ObtenerListaDeCompraUseCase,
   ProductoConEstado,
 } from '../../application';
+import { Categoria, Producto, SeedMetaRepository } from '../../domain';
 import { runViewTransition } from '../../core/utils/view-transition';
+import { ProductoFormSheetComponent } from '../administracion/sheets/producto-form-sheet.component';
+import { AgregarProductoCompraSheetComponent } from './sheets/agregar-producto-compra-sheet.component';
+
+const OMITIR_REVISION_SESSION_KEY = 'kmarket.omitirRevision';
 
 export type ModoVista = 'resumen' | 'recorrido' | 'revision';
 
@@ -27,6 +35,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
     MatProgressBarModule,
     MatCheckboxModule,
     MatSnackBarModule,
+    MatBottomSheetModule,
   ],
   template: `
     <div class="preparar-wrapper" [class.has-footer]="modo === 'recorrido' || modo === 'revision'">
@@ -132,6 +141,10 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
               </span>
             </div>
             <h1 class="category-title font-serif km-vt-leaf">{{ categoriaActual.categoria.nombre }}</h1>
+            <button mat-stroked-button class="km-btn-secondary add-product-btn" type="button" (click)="abrirAgregarProducto()">
+              <mat-icon>add</mat-icon>
+              Agregar producto
+            </button>
           </div>
 
           <div class="km-card list-card km-vt-sheet">
@@ -166,8 +179,12 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
           <div class="revision-header">
             <h1 class="font-serif revision-title km-vt-leaf">Resumen de compra</h1>
             <p class="revision-desc">
-              Revisa los {{ totalSeleccionados }} productos seleccionados antes de finalizar.
+              Destildá cada producto al meterlo en el changuito. Quedan {{ pendientesRecoger }} de {{ totalSeleccionados }} por guardar.
             </p>
+            <button mat-stroked-button class="km-btn-secondary add-product-btn" type="button" (click)="abrirAgregarProducto()">
+              <mat-icon>add</mat-icon>
+              Agregar producto
+            </button>
           </div>
 
           <div class="revision-content km-vt-sheet">
@@ -181,16 +198,16 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
               <div
                 *ngFor="let item of catGroup.items; trackBy: trackByProducto"
                 class="km-list-item"
-                [class.is-selected]="item.estado.comprar"
+                [class.is-selected]="!item.estado.recogido"
                 role="button"
                 tabindex="0"
-                [attr.aria-pressed]="item.estado.comprar"
-                (click)="toggleProducto(item)"
-                (keydown.enter)="toggleProducto(item)"
-                (keydown.space)="$event.preventDefault(); toggleProducto(item)"
+                [attr.aria-pressed]="!item.estado.recogido"
+                (click)="toggleRecogido(item)"
+                (keydown.enter)="toggleRecogido(item)"
+                (keydown.space)="$event.preventDefault(); toggleRecogido(item)"
               >
                 <span class="item-name">{{ item.producto.nombre }}</span>
-                <div class="check-visual" [class.checked]="item.estado.comprar" aria-hidden="true"></div>
+                <div class="check-visual" [class.checked]="!item.estado.recogido" aria-hidden="true"></div>
               </div>
             </div>
 
@@ -249,7 +266,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
               mat-flat-button
               class="km-btn-primary nav-btn"
               type="button"
-              [disabled]="totalSeleccionados === 0 || procesando"
+              [disabled]="!puedeFinalizar || procesando"
               (click)="pedirOConfirmarFinalizar()"
             >
               <mat-icon>check</mat-icon>
@@ -510,6 +527,15 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       height: 36px;
       color: var(--km-text-muted);
     }
+    .add-product-btn {
+      width: 100%;
+      margin-top: 12px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
 
     /* Wizard Bottom Footer */
     .wizard-footer {
@@ -578,10 +604,11 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
 export class PrepararCompraComponent implements OnInit {
   modo: ModoVista = 'resumen';
   categorias: CategoriaConProductos[] = [];
+  productos: Producto[] = [];
+  catalogoCategorias: Categoria[] = [];
   indiceCategoria = 0;
   procesando = false;
   cargando = true;
-  // settlingId removed: we render the check immediately and persist asynchronously
   confirmandoFinalizar = false;
   errorFinalizar = '';
 
@@ -589,19 +616,33 @@ export class PrepararCompraComponent implements OnInit {
     private router: Router,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
+    private bottomSheet: MatBottomSheet,
     private obtenerListaCompraUseCase: ObtenerListaDeCompraUseCase,
     private alternarProductoUseCase: AlternarProductoEnCompraUseCase,
-    private finalizarCompraUseCase: FinalizarCompraUseCase
+    private finalizarCompraUseCase: FinalizarCompraUseCase,
+    private gestionarProductosUseCase: GestionarProductosUseCase,
+    private gestionarCategoriasUseCase: GestionarCategoriasUseCase,
+    private seedMeta: SeedMetaRepository,
   ) {}
 
   async ngOnInit(): Promise<void> {
     await this.cargarDatos();
+    if (await this.seedMeta.revisionEnCurso()) {
+      this.modo = 'revision';
+    }
   }
 
   async cargarDatos(): Promise<void> {
     this.cargando = true;
     try {
-      this.categorias = await this.obtenerListaCompraUseCase.obtenerAgrupadoPorCategoria(false);
+      const [categorias, productos, catalogo] = await Promise.all([
+        this.obtenerListaCompraUseCase.obtenerAgrupadoPorCategoria(false),
+        this.gestionarProductosUseCase.listar(),
+        this.gestionarCategoriasUseCase.listar(),
+      ]);
+      this.categorias = categorias;
+      this.productos = productos;
+      this.catalogoCategorias = catalogo.filter((c) => c.activa).sort((a, b) => a.orden - b.orden);
     } finally {
       this.cargando = false;
     }
@@ -653,6 +694,22 @@ export class PrepararCompraComponent implements OnInit {
       .filter((cat) => cat.items.length > 0);
   }
 
+  get pendientesRecoger(): number {
+    let count = 0;
+    for (const cat of this.categorias) {
+      for (const item of cat.items) {
+        if (item.estado.comprar && !item.estado.recogido) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
+  get puedeFinalizar(): boolean {
+    return this.totalSeleccionados > 0 && this.pendientesRecoger === 0;
+  }
+
   get etiquetaFinalizar(): string {
     if (this.procesando) {
       return 'Cerrando compra…';
@@ -661,6 +718,11 @@ export class PrepararCompraComponent implements OnInit {
       return this.totalSeleccionados === 1
         ? 'Sí, cerrar 1 producto'
         : `Sí, cerrar ${this.totalSeleccionados} productos`;
+    }
+    if (this.pendientesRecoger > 0) {
+      return this.pendientesRecoger === 1
+        ? 'Destildá 1 producto'
+        : `Destildá ${this.pendientesRecoger} productos`;
     }
     return `Finalizar compra (${this.totalSeleccionados})`;
   }
@@ -675,6 +737,7 @@ export class PrepararCompraComponent implements OnInit {
   irARevision(): void {
     this.confirmandoFinalizar = false;
     this.errorFinalizar = '';
+    void this.seedMeta.marcarRevisionEnCurso();
     runViewTransition(this.cdr, 'forward', () => {
       this.modo = 'revision';
     });
@@ -693,6 +756,7 @@ export class PrepararCompraComponent implements OnInit {
     this.errorFinalizar = '';
     runViewTransition(this.cdr, 'forward', () => {
       if (this.esUltimaCategoria) {
+        void this.seedMeta.marcarRevisionEnCurso();
         this.modo = 'revision';
       } else {
         this.indiceCategoria++;
@@ -711,12 +775,14 @@ export class PrepararCompraComponent implements OnInit {
     const nuevoValor = !item.estado.comprar;
     // update UI immediately
     item.estado.comprar = nuevoValor;
+    item.estado.recogido = false;
     this.cdr.detectChanges();
     // persist in background without blocking the UI
     void this.alternarProductoUseCase.ejecutar(item.producto.id, nuevoValor, item.estado.ultimaCompra).catch((err) => {
       // on error, revert state and inform user minimally
       console.error('Error guardando estado de producto', err);
       item.estado.comprar = !nuevoValor;
+      item.estado.recogido = false;
       this.cdr.detectChanges();
       this.snackBar.open('No se pudo actualizar el producto. Intentá de nuevo.', 'Cerrar', { duration: 3000 });
     });
@@ -726,8 +792,22 @@ export class PrepararCompraComponent implements OnInit {
     return item.producto.id;
   }
 
+  async toggleRecogido(item: ProductoConEstado): Promise<void> {
+    const nuevoValor = !item.estado.recogido;
+    item.estado.recogido = nuevoValor;
+    this.cdr.detectChanges();
+    void this.alternarProductoUseCase
+      .ejecutarRecogido(item.producto.id, nuevoValor, item.estado.comprar, item.estado.ultimaCompra)
+      .catch((err) => {
+        console.error('Error guardando recogido', err);
+        item.estado.recogido = !nuevoValor;
+        this.cdr.detectChanges();
+        this.snackBar.open('No se pudo actualizar el producto. Intentá de nuevo.', 'Cerrar', { duration: 3000 });
+      });
+  }
+
   pedirOConfirmarFinalizar(): void {
-    if (this.procesando || this.totalSeleccionados === 0) return;
+    if (this.procesando || !this.puedeFinalizar) return;
     this.errorFinalizar = '';
     if (!this.confirmandoFinalizar) {
       this.confirmandoFinalizar = true;
@@ -748,6 +828,8 @@ export class PrepararCompraComponent implements OnInit {
 
     try {
       const cantidad = await this.finalizarCompraUseCase.ejecutar();
+      await this.seedMeta.limpiarRevisionEnCurso();
+      sessionStorage.removeItem(OMITIR_REVISION_SESSION_KEY);
       this.snackBar.open(
         `Compra cerrada. Se actualizaron ${cantidad} productos en la despensa.`,
         'Cerrar',
@@ -765,7 +847,96 @@ export class PrepararCompraComponent implements OnInit {
     this.router.navigate(['/administracion']);
   }
 
+  abrirAgregarProducto(): void {
+    const idsEnLista = new Set(
+      this.categorias.flatMap((cat) =>
+        cat.items.filter((item) => item.estado.comprar).map((item) => item.producto.id),
+      ),
+    );
+    const productosDisponibles = this.productos.filter((p) => p.activo && !idsEnLista.has(p.id));
+    const sheetRef = this.bottomSheet.open(AgregarProductoCompraSheetComponent, {
+      panelClass: 'km-producto-sheet',
+      data: {
+        productosDisponibles,
+        nombreCategoria: (categoriaId: string) =>
+          this.catalogoCategorias.find((c) => c.id === categoriaId)?.nombre ?? 'Sin categoría',
+      },
+    });
+
+    sheetRef.afterDismissed().subscribe((resultado) => {
+      if (!resultado) return;
+      if (resultado.accion === 'agregar') {
+        void this.marcarProductoEnLista(resultado.producto);
+        return;
+      }
+      this.abrirCrearProducto();
+    });
+  }
+
+  abrirCrearProducto(): void {
+    const sheetRef = this.bottomSheet.open(ProductoFormSheetComponent, {
+      panelClass: 'km-producto-sheet',
+      data: {
+        categorias: this.catalogoCategorias,
+        productos: this.productos,
+        categoriaIdPreseleccionada: this.categoriaActual?.categoria.id,
+      },
+    });
+
+    sheetRef.afterDismissed().subscribe(async (formValue) => {
+      if (!formValue) return;
+      const creado = await this.gestionarProductosUseCase.crear(formValue);
+      this.productos = [...this.productos, creado];
+      if (creado.activo) {
+        await this.marcarProductoEnLista(creado);
+      }
+      this.snackBar.open('Producto creado', 'Cerrar', { duration: 2000 });
+    });
+  }
+
+  private async marcarProductoEnLista(producto: Producto): Promise<void> {
+    const grupo = this.categorias.find((cat) => cat.categoria.id === producto.categoriaId);
+    let item = grupo?.items.find((i) => i.producto.id === producto.id);
+    if (item) {
+      item.estado.comprar = true;
+      item.estado.recogido = false;
+    } else if (grupo) {
+      item = {
+        producto,
+        estado: {
+          productoId: producto.id,
+          ultimaCompra: null,
+          comprar: true,
+          recogido: false,
+        },
+      };
+      grupo.items = [...grupo.items, item];
+    } else {
+      const categoria = this.catalogoCategorias.find((c) => c.id === producto.categoriaId);
+      if (categoria) {
+        item = {
+          producto,
+          estado: {
+            productoId: producto.id,
+            ultimaCompra: null,
+            comprar: true,
+            recogido: false,
+          },
+        };
+        this.categorias = [...this.categorias, { categoria, items: [item] }];
+      }
+    }
+
+    this.cdr.detectChanges();
+    try {
+      await this.alternarProductoUseCase.ejecutar(producto.id, true, item?.estado.ultimaCompra ?? null);
+    } catch {
+      this.snackBar.open('No se pudo agregar el producto. Intentá de nuevo.', 'Cerrar', { duration: 3000 });
+    }
+  }
+
   salir(): void {
+    sessionStorage.setItem(OMITIR_REVISION_SESSION_KEY, '1');
     this.router.navigate(['/']);
   }
 }

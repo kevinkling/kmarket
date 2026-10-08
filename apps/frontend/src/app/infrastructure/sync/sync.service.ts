@@ -311,6 +311,7 @@ export class SyncService {
       productoId,
       ultimaCompra,
       comprar: Boolean(record['comprar']),
+      recogido: Boolean(record['recogido']),
       updatedAt: new Date(String(record['updated'] ?? Date.now())),
     };
   }
@@ -337,6 +338,7 @@ export class SyncService {
       productoId: estado.productoId,
       ultimaCompra: estado.ultimaCompra,
       comprar: estado.comprar,
+      recogido: Boolean(estado.recogido),
     }, estado.updatedAt);
   }
 

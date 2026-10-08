@@ -9,6 +9,9 @@ import {
   ObtenerListaDeCompraUseCase,
 } from '../../application';
 import { AuthService } from '../../core/services/auth.service';
+import { SeedMetaRepository } from '../../domain';
+
+const OMITIR_REVISION_SESSION_KEY = 'kmarket.omitirRevision';
 
 @Component({
   selector: 'app-home',
@@ -257,11 +260,13 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private obtenerSugerenciasUseCase: ObtenerSugerenciasUseCase,
     private iniciarPreparacionUseCase: IniciarPreparacionDeCompraUseCase,
-    private obtenerListaCompraUseCase: ObtenerListaDeCompraUseCase
+    private obtenerListaCompraUseCase: ObtenerListaDeCompraUseCase,
+    private seedMeta: SeedMetaRepository,
   ) {}
 
   async ngOnInit(): Promise<void> {
     await this.cargarDatos();
+    await this.reanudarRevisionSiCorresponde();
   }
 
   async cargarDatos(): Promise<void> {
@@ -280,5 +285,19 @@ export class HomeComponent implements OnInit {
       await this.iniciarPreparacionUseCase.ejecutar();
     }
     this.router.navigate(['/preparar-compra']);
+  }
+
+  private async reanudarRevisionSiCorresponde(): Promise<void> {
+    if (sessionStorage.getItem(OMITIR_REVISION_SESSION_KEY) === '1') {
+      return;
+    }
+    if (!(await this.seedMeta.revisionEnCurso())) {
+      return;
+    }
+    if (this.enProgresoCount === 0) {
+      await this.seedMeta.limpiarRevisionEnCurso();
+      return;
+    }
+    await this.router.navigate(['/preparar-compra']);
   }
 }
