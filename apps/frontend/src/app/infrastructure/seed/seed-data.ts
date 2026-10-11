@@ -6,15 +6,15 @@ export interface SeedProducto {
   mes?: string;
 }
 
-export const CATEGORIAS_SEED: { id: string; nombre: string; orden: number; intervaloPorDefecto: number }[] = [
-  { id: 'almacen_secos', nombre: 'Almacén y Secos', orden: 1, intervaloPorDefecto: 30 },
-  { id: 'panaderia_masas', nombre: 'Panadería y Masas', orden: 2, intervaloPorDefecto: 15 },
-  { id: 'lacteos_huevos', nombre: 'Lácteos y Huevos', orden: 3, intervaloPorDefecto: 7 },
-  { id: 'condimentos', nombre: 'Condimentos y Especias', orden: 4, intervaloPorDefecto: 60 },
-  { id: 'frutas_verduras', nombre: 'Frutas y Verduras', orden: 5, intervaloPorDefecto: 7 },
-  { id: 'carnes_congelados', nombre: 'Carnes y Congelados', orden: 6, intervaloPorDefecto: 15 },
-  { id: 'higiene_personal', nombre: 'Higiene Personal', orden: 7, intervaloPorDefecto: 30 },
-  { id: 'limpieza_hogar', nombre: 'Limpieza del Hogar', orden: 8, intervaloPorDefecto: 30 },
+export const CATEGORIAS_SEED: { id: string; nombre: string; orden: number }[] = [
+  { id: 'almacen_secos', nombre: 'Almacén y Secos', orden: 1 },
+  { id: 'panaderia_masas', nombre: 'Panadería y Masas', orden: 2 },
+  { id: 'lacteos_huevos', nombre: 'Lácteos y Huevos', orden: 3 },
+  { id: 'condimentos', nombre: 'Condimentos y Especias', orden: 4 },
+  { id: 'frutas_verduras', nombre: 'Frutas y Verduras', orden: 5 },
+  { id: 'carnes_congelados', nombre: 'Carnes y Congelados', orden: 6 },
+  { id: 'higiene_personal', nombre: 'Higiene Personal', orden: 7 },
+  { id: 'limpieza_hogar', nombre: 'Limpieza del Hogar', orden: 8 },
 ];
 
 export const PRODUCTOS_SEED: SeedProducto[] = [

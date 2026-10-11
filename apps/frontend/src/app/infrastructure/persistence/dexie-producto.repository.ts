@@ -5,16 +5,25 @@ import { db } from './kmarket.db';
 @Injectable({ providedIn: 'root' })
 export class DexieProductoRepository implements ProductoRepository {
   async listar(): Promise<Producto[]> {
-    return await db.productos.toArray();
+    const records = await db.productos.toArray();
+    return records.map((record) => this.map(record));
   }
 
   async obtener(id: string): Promise<Producto | null> {
     const record = await db.productos.get(id);
-    return record || null;
+    return record ? this.map(record) : null;
   }
 
   async listarPorCategoria(categoriaId: string): Promise<Producto[]> {
-    return await db.productos.where('categoriaId').equals(categoriaId).toArray();
+    const records = await db.productos.where('categoriaId').equals(categoriaId).toArray();
+    return records.map((record) => this.map(record));
+  }
+
+  private map(record: Producto): Producto {
+    return {
+      ...record,
+      notas: record.notas ?? '',
+    };
   }
 
   async crear(producto: Producto): Promise<Producto> {

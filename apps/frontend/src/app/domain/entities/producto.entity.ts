@@ -2,7 +2,7 @@ export interface Producto {
   id: string;
   nombre: string;
   categoriaId: string;
-  intervaloDias: number;
+  notas: string;
   activo: boolean;
-  updatedAt?: Date; // Campo opcional para sincronización
+  updatedAt?: Date;
 }

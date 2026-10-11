@@ -11,7 +11,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
-import { Categoria, Producto } from '../../domain';
+import { Categoria, EstadoProductoRepository, Producto } from '../../domain';
+import { textoUltimaCompra } from '../../core/utils/fecha-compra';
 import { GestionarCategoriasUseCase, GestionarProductosUseCase } from '../../application';
 import { ProductoFormSheetComponent } from './sheets/producto-form-sheet.component';
 import { CategoriaFormSheetComponent } from './sheets/categoria-form-sheet.component';
@@ -108,8 +109,9 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
                   <div class="item-meta">
                     <span class="meta-tag">{{ getNombreCategoria(prod.categoriaId) }}</span>
                     <span class="dot">•</span>
-                    <span>Cada {{ prod.intervaloDias }} días</span>
+                    <span>{{ etiquetaUltimaCompra(prod.id) }}</span>
                   </div>
+                  <p class="item-nota" *ngIf="prod.notas">{{ prod.notas }}</p>
                 </button>
 
                 <div class="item-actions">
@@ -324,6 +326,12 @@ import { ConfirmSheetComponent } from '../../core/components/confirm-sheet/confi
       font-size: 0.8rem;
       color: var(--km-text-secondary);
     }
+    .item-nota {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--km-text-secondary);
+      overflow-wrap: anywhere;
+    }
     .dot {
       color: var(--km-text-muted);
     }
@@ -358,13 +366,15 @@ export class AdministracionComponent implements OnInit {
   categoriaFiltroId = 'todas';
   selectedTab = 0;
   cargando = true;
+  private ultimaCompraPorProducto = new Map<string, Date | null>();
 
   constructor(
     private bottomSheet: MatBottomSheet,
     private snackBar: MatSnackBar,
     private router: Router,
     private gestionarProductosUseCase: GestionarProductosUseCase,
-    private gestionarCategoriasUseCase: GestionarCategoriasUseCase
+    private gestionarCategoriasUseCase: GestionarCategoriasUseCase,
+    private estadoRepo: EstadoProductoRepository,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -385,8 +395,14 @@ export class AdministracionComponent implements OnInit {
   async cargarDatos(): Promise<void> {
     this.cargando = true;
     try {
-      this.categorias = await this.gestionarCategoriasUseCase.listar();
-      this.productos = await this.gestionarProductosUseCase.listar();
+      const [categorias, productos, estados] = await Promise.all([
+        this.gestionarCategoriasUseCase.listar(),
+        this.gestionarProductosUseCase.listar(),
+        this.estadoRepo.listarTodos(),
+      ]);
+      this.categorias = categorias;
+      this.productos = productos;
+      this.ultimaCompraPorProducto = new Map(estados.map((estado) => [estado.productoId, estado.ultimaCompra]));
       this.filtrarProductos();
     } finally {
       this.cargando = false;
@@ -413,6 +429,11 @@ export class AdministracionComponent implements OnInit {
     this.productosFiltrados = result;
   }
 
+  etiquetaUltimaCompra(productoId: string): string {
+    const fecha = this.ultimaCompraPorProducto.get(productoId) ?? null;
+    return fecha ? `Última compra: ${textoUltimaCompra(fecha)}` : 'Sin compras';
+  }
+
   abrirModalProducto(producto?: Producto): void {
     const sheetRef = this.bottomSheet.open(ProductoFormSheetComponent, {
       panelClass: 'km-producto-sheet',
@@ -420,6 +441,9 @@ export class AdministracionComponent implements OnInit {
         producto,
         categorias: this.categorias,
         productos: this.productos,
+        categoriaIdPreseleccionada:
+          !producto && this.categoriaFiltroId !== 'todas' ? this.categoriaFiltroId : undefined,
+        ultimaCompra: producto ? (this.ultimaCompraPorProducto.get(producto.id) ?? null) : null,
       },
     });
 

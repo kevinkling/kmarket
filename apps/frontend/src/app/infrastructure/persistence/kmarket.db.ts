@@ -12,7 +12,7 @@ export interface ProductoTable {
   id: string;
   nombre: string;
   categoriaId: string;
-  intervaloDias: number;
+  notas: string;
   activo: boolean;
   updatedAt?: Date;
 }
@@ -72,6 +72,19 @@ export class KMarketDB extends Dexie {
         if (estado.recogido === undefined) {
           estado.recogido = false;
         }
+      });
+    });
+    this.version(4).stores({
+      categorias: '&id, nombre, orden, activa, updatedAt',
+      productos: '&id, nombre, categoriaId, activo, updatedAt',
+      estadosProducto: '&productoId, ultimaCompra, comprar, recogido, updatedAt',
+      meta: '&key',
+    }).upgrade((tx) => {
+      return tx.table('productos').toCollection().modify((producto: ProductoTable & { intervaloDias?: number }) => {
+        if (!producto.notas) {
+          producto.notas = '';
+        }
+        delete producto.intervaloDias;
       });
     });
   }

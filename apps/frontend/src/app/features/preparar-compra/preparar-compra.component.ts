@@ -17,6 +17,7 @@ import {
   ProductoConEstado,
 } from '../../application';
 import { Categoria, Producto, SeedMetaRepository } from '../../domain';
+import { textoUltimaCompra } from '../../core/utils/fecha-compra';
 import { runViewTransition } from '../../core/utils/view-transition';
 import { ProductoFormSheetComponent } from '../administracion/sheets/producto-form-sheet.component';
 import { AgregarProductoCompraSheetComponent } from './sheets/agregar-producto-compra-sheet.component';
@@ -102,11 +103,6 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                 <span class="summary-label">Categorías a revisar</span>
                 <span class="summary-value">{{ categorias.length }}</span>
               </div>
-              <div class="km-divider"></div>
-              <div class="summary-item">
-                <span class="summary-label">Sugeridos automáticamente</span>
-                <span class="summary-value highlight">{{ totalSugeridos }}</span>
-              </div>
             </div>
 
             <div class="step-actions">
@@ -161,9 +157,8 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
             >
               <div class="item-info">
                 <span class="item-name">{{ item.producto.nombre }}</span>
-                <span class="km-badge km-badge-yellow" *ngIf="item.estado.comprar && !item.estado.ultimaCompra">
-                  Nuevo / Sin compra
-                </span>
+                <span class="item-note" *ngIf="item.producto.notas">{{ item.producto.notas }}</span>
+                <span class="item-note">{{ etiquetaUltimaCompra(item.estado.ultimaCompra) }}</span>
               </div>
               <div class="check-visual" [class.checked]="item.estado.comprar" aria-hidden="true"></div>
             </div>
@@ -206,7 +201,10 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                 (keydown.enter)="toggleRecogido(item)"
                 (keydown.space)="$event.preventDefault(); toggleRecogido(item)"
               >
-                <span class="item-name">{{ item.producto.nombre }}</span>
+                <div class="item-info">
+                  <span class="item-name">{{ item.producto.nombre }}</span>
+                  <span class="item-note" *ngIf="item.producto.notas">{{ item.producto.notas }}</span>
+                </div>
                 <div class="check-visual" [class.checked]="!item.estado.recogido" aria-hidden="true"></div>
               </div>
             </div>
@@ -455,6 +453,11 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
       font-weight: 500;
       overflow-wrap: anywhere;
     }
+    .item-note {
+      font-size: 0.8rem;
+      color: var(--km-text-secondary);
+      overflow-wrap: anywhere;
+    }
     /* Compact check visual used in the recorrido list to avoid MDC checkbox animations */
     .check-visual {
       width: 28px;
@@ -655,8 +658,8 @@ export class PrepararCompraComponent implements OnInit {
     return this.categorias[this.indiceCategoria];
   }
 
-  get totalSugeridos(): number {
-    return this.totalSeleccionados;
+  etiquetaUltimaCompra(fecha: Date | null): string {
+    return fecha ? `Última compra: ${textoUltimaCompra(fecha)}` : 'Sin compras';
   }
 
   get totalSeleccionados(): number {
@@ -869,17 +872,18 @@ export class PrepararCompraComponent implements OnInit {
         void this.marcarProductoEnLista(resultado.producto);
         return;
       }
-      this.abrirCrearProducto();
+      this.abrirCrearProducto(resultado.nombre);
     });
   }
 
-  abrirCrearProducto(): void {
+  abrirCrearProducto(nombreInicial = ''): void {
     const sheetRef = this.bottomSheet.open(ProductoFormSheetComponent, {
       panelClass: 'km-producto-sheet',
       data: {
         categorias: this.catalogoCategorias,
         productos: this.productos,
         categoriaIdPreseleccionada: this.categoriaActual?.categoria.id,
+        nombreInicial,
       },
     });
 

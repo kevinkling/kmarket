@@ -15,7 +15,7 @@ export interface AgregarProductoCompraSheetData {
 
 export type AgregarProductoCompraResultado =
   | { accion: 'agregar'; producto: Producto }
-  | { accion: 'crear' };
+  | { accion: 'crear'; nombre: string };
 
 @Component({
   selector: 'app-agregar-producto-compra-sheet',
@@ -144,7 +144,7 @@ export class AgregarProductoCompraSheetComponent {
   }
 
   crear(): void {
-    this.sheetRef.dismiss({ accion: 'crear' });
+    this.sheetRef.dismiss({ accion: 'crear', nombre: this.busqueda.trim() });
   }
 
   cancelar(): void {

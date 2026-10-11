@@ -3,11 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  IniciarPreparacionDeCompraUseCase,
-  ObtenerSugerenciasUseCase,
-  ObtenerListaDeCompraUseCase,
-} from '../../application';
+import { ObtenerListaDeCompraUseCase } from '../../application';
 import { AuthService } from '../../core/services/auth.service';
 import { SeedMetaRepository } from '../../domain';
 
@@ -22,7 +18,7 @@ const OMITIR_REVISION_SESSION_KEY = 'kmarket.omitirRevision';
       <section class="hero-section">
         <h1 class="title font-serif">Estado de la compra</h1>
         <p class="description">
-          Controlá la despensa. Te sugerimos qué reponer, sin armar listas a mano.
+          Controlá la despensa y marcá lo que falta cuando prepares la compra.
         </p>
         <a *ngIf="!auth.sessionValid()" routerLink="/login" class="local-hint">
           Esta despensa queda en este dispositivo. Entrá para sincronizar con la familia.
@@ -31,33 +27,19 @@ const OMITIR_REVISION_SESSION_KEY = 'kmarket.omitirRevision';
 
       <div class="km-card status-card" [attr.aria-busy]="cargando">
         <ng-container *ngIf="!cargando; else loadingHome">
-          <div class="status-header">
-            <span class="km-badge km-badge-yellow" *ngIf="sugeridosCount > 0">
-              <mat-icon class="badge-icon">auto_awesome</mat-icon>
-              {{ sugeridosCount }} sugerencias hoy
-            </span>
-            <span class="km-badge km-badge-green" *ngIf="sugeridosCount === 0">
-              <mat-icon class="badge-icon">check_circle</mat-icon>
-              Despensa al día
+          <div class="status-header" *ngIf="enProgresoCount > 0">
+            <span class="km-badge km-badge-blue">
+              {{ enProgresoCount === 1 ? '1 marcado en la compra actual' : enProgresoCount + ' marcados en la compra actual' }}
             </span>
           </div>
 
           <div class="status-body">
-            <div class="metric" *ngIf="sugeridosCount > 0">
-              <span class="metric-number">{{ sugeridosCount }}</span>
-              <span class="metric-label">
-                {{ sugeridosCount === 1 ? 'producto sugerido para reponer' : 'productos sugeridos para reponer' }}
-              </span>
-            </div>
-            <p class="status-copy" *ngIf="sugeridosCount === 0">
-              Nada que reponer por ahora. Prepará una compra si se te acabó algo.
+            <p class="status-copy" *ngIf="enProgresoCount === 0">
+              Marcá los productos que faltan al preparar la compra.
             </p>
-
-            <div class="metric-secondary" *ngIf="enProgresoCount > 0">
-              <span class="km-badge km-badge-blue">
-                {{ enProgresoCount === 1 ? '1 marcado en la compra actual' : enProgresoCount + ' marcados en la compra actual' }}
-              </span>
-            </div>
+            <p class="status-copy" *ngIf="enProgresoCount > 0">
+              Hay una compra en curso. Podés seguir donde la dejaste.
+            </p>
           </div>
 
           <div class="status-actions km-vt-stage">
@@ -251,15 +233,12 @@ const OMITIR_REVISION_SESSION_KEY = 'kmarket.omitirRevision';
   `]
 })
 export class HomeComponent implements OnInit {
-  sugeridosCount = 0;
   enProgresoCount = 0;
   cargando = true;
   readonly auth = inject(AuthService);
 
   constructor(
     private router: Router,
-    private obtenerSugerenciasUseCase: ObtenerSugerenciasUseCase,
-    private iniciarPreparacionUseCase: IniciarPreparacionDeCompraUseCase,
     private obtenerListaCompraUseCase: ObtenerListaDeCompraUseCase,
     private seedMeta: SeedMetaRepository,
   ) {}
@@ -272,7 +251,6 @@ export class HomeComponent implements OnInit {
   async cargarDatos(): Promise<void> {
     this.cargando = true;
     try {
-      this.sugeridosCount = await this.obtenerSugerenciasUseCase.obtenerConteo();
       const lista = await this.obtenerListaCompraUseCase.obtenerAgrupadoPorCategoria(true);
       this.enProgresoCount = lista.reduce((acc, cat) => acc + cat.items.length, 0);
     } finally {
@@ -280,10 +258,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  async iniciarPreparacion(): Promise<void> {
-    if (this.enProgresoCount === 0) {
-      await this.iniciarPreparacionUseCase.ejecutar();
-    }
+  iniciarPreparacion(): void {
     this.router.navigate(['/preparar-compra']);
   }
 

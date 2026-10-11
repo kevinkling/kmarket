@@ -298,7 +298,7 @@ export class SyncService {
       id: record.id,
       nombre: String(record['nombre'] ?? ''),
       categoriaId: String(record['categoriaId'] ?? ''),
-      intervaloDias: Number(record['intervaloDias'] ?? 0),
+      notas: String(record['notas'] ?? ''),
       activo: Boolean(record['activo']),
       updatedAt: new Date(String(record['updated'] ?? Date.now())),
     };
@@ -328,7 +328,7 @@ export class SyncService {
     await this.upsert('productos', producto.id, {
       nombre: producto.nombre,
       categoriaId: producto.categoriaId,
-      intervaloDias: producto.intervaloDias,
+      notas: producto.notas ?? '',
       activo: producto.activo,
     }, producto.updatedAt);
   }

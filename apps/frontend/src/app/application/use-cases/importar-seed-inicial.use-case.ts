@@ -25,25 +25,20 @@ export class ImportarSeedInicialUseCase {
       return false;
     }
 
-    const categoriasMap = new Map<string, number>();
-
     const importadoEn = new Date();
-    const categorias: Categoria[] = CATEGORIAS_SEED.map((c) => {
-      categoriasMap.set(c.id, c.intervaloPorDefecto);
-      return {
-        id: c.id,
-        nombre: c.nombre,
-        orden: c.orden,
-        activa: true,
-        updatedAt: importadoEn,
-      };
-    });
+    const categorias: Categoria[] = CATEGORIAS_SEED.map((c) => ({
+      id: c.id,
+      nombre: c.nombre,
+      orden: c.orden,
+      activa: true,
+      updatedAt: importadoEn,
+    }));
 
     const productos: Producto[] = PRODUCTOS_SEED.map((p) => ({
       id: p.id,
       nombre: p.nombre,
       categoriaId: p.categoria,
-      intervaloDias: categoriasMap.get(p.categoria) ?? 30,
+      notas: '',
       activo: true,
       updatedAt: importadoEn,
     }));
