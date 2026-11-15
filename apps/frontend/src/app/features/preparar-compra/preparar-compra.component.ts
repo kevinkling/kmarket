@@ -103,6 +103,10 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                 <span class="summary-label">Categorías a revisar</span>
                 <span class="summary-value">{{ categorias.length }}</span>
               </div>
+              <div class="summary-item" *ngIf="totalSeleccionados > 0">
+                <span class="summary-label">Ya marcados para comprar</span>
+                <span class="summary-value">{{ totalSeleccionados }}</span>
+              </div>
             </div>
 
             <div class="step-actions">
@@ -113,6 +117,15 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
               >
                 Comenzar recorrido
                 <mat-icon>arrow_forward</mat-icon>
+              </button>
+              <button
+                mat-stroked-button
+                class="km-btn-secondary full-width"
+                type="button"
+                (click)="abrirAgregarProducto()"
+              >
+                <mat-icon>add</mat-icon>
+                Producto a comprar
               </button>
               <button
                 mat-stroked-button
@@ -934,6 +947,9 @@ export class PrepararCompraComponent implements OnInit {
     this.cdr.detectChanges();
     try {
       await this.alternarProductoUseCase.ejecutar(producto.id, true, item?.estado.ultimaCompra ?? null);
+      if (this.modo === 'resumen') {
+        this.snackBar.open(`${producto.nombre} agregado a la compra`, 'Cerrar', { duration: 2500 });
+      }
     } catch {
       this.snackBar.open('No se pudo agregar el producto. Intentá de nuevo.', 'Cerrar', { duration: 3000 });
     }
