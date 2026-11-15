@@ -1,0 +1,66 @@
+{
+  "configVersion": 1,
+  "timestamp": 1794783585989,
+  "index": "/kmarket/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/kmarket/chunk-6BVSB3CT.js",
+        "/kmarket/chunk-OEOIERBV.js",
+        "/kmarket/favicon.ico",
+        "/kmarket/index.html",
+        "/kmarket/main-P7M5X4F3.js",
+        "/kmarket/manifest.webmanifest",
+        "/kmarket/polyfills-IOO3XMUJ.js",
+        "/kmarket/styles-5XO5WS4J.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/kmarket/chunk-6BVSB3CT.js": "3641389d56a7d0d5dfd721fad77d3d12b94dce2c",
+    "/kmarket/chunk-OEOIERBV.js": "af7cb223e8d100c76bed0ff4529710529282b6d9",
+    "/kmarket/favicon.ico": "db4e11123af13ebd6c06b276e3d574c0363ee889",
+    "/kmarket/index.html": "42a2f88171dbb5f3a7a56cfa461f335ab3470723",
+    "/kmarket/main-P7M5X4F3.js": "307db870586404b41284f34b8f317159d00f7a17",
+    "/kmarket/manifest.webmanifest": "c6f9022034ab708b5dddc87ad5081a26d20e4d9b",
+    "/kmarket/polyfills-IOO3XMUJ.js": "f2241e9a25858f895ce299d15f6f22e849e2fd72",
+    "/kmarket/styles-5XO5WS4J.css": "b0f51936369190cca327cdd512aa135c4042f9df"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
