@@ -49,6 +49,8 @@ export interface ProductoSheetData {
               placeholder="Ej: Arroz, Detergente"
               maxlength="80"
               autocomplete="off"
+              autocapitalize="sentences"
+              enterkeyhint="next"
               (focus)="nombreEnfocado = true"
               (blur)="nombreEnfocado = false"
               (input)="sugerenciasVisibles = true"
@@ -164,10 +166,6 @@ export interface ProductoSheetData {
     .chips-field + .full-width {
       margin-top: 16px;
     }
-    .nombre-block {
-      position: relative;
-      z-index: 3;
-    }
     .nombre-block .full-width {
       margin-top: 0;
     }
@@ -190,7 +188,8 @@ export interface ProductoSheetData {
     }
     .chip {
       margin: 0;
-      padding: 8px 12px;
+      min-height: 40px;
+      padding: 8px 14px;
       border: var(--km-border);
       border-radius: 999px;
       background: transparent;
@@ -220,27 +219,21 @@ export interface ProductoSheetData {
       color: var(--km-text-secondary);
     }
     .sugerencias {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 100%;
-      z-index: 4;
       list-style: none;
-      margin: -10px 0 0;
+      margin: 6px 0 0;
       padding: 0;
-      max-height: 196px;
-      overflow-x: hidden;
-      overflow-y: auto;
+      overflow: hidden;
       background: var(--km-bg-surface);
       border: var(--km-border);
-      border-radius: 6px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      border-radius: var(--km-radius-sm);
     }
     .sugerencia {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+      box-sizing: border-box;
       width: 100%;
       margin: 0;
       padding: 12px 14px;
@@ -267,6 +260,18 @@ export interface ProductoSheetData {
       font-size: 0.95rem;
       font-weight: 600;
       color: var(--km-text-primary);
+    }
+    .sugerencia-nombre {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .sugerencia-cat {
+      flex-shrink: 0;
+      max-width: 45%;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .sugerencia-cat {
       font-size: 0.8rem;
@@ -316,7 +321,7 @@ export class ProductoFormSheetComponent implements OnInit, AfterViewInit {
     if (q.length < 2) return [];
     return (this.data.productos ?? [])
       .filter((p) => p.nombre.toLowerCase().includes(q))
-      .slice(0, 6);
+      .slice(0, 5);
   }
 
   nombreCategoria(categoriaId: string): string {

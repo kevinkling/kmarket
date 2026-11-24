@@ -43,8 +43,10 @@ export type AgregarProductoCompraResultado =
           <input
             matInput
             [(ngModel)]="busqueda"
+            type="search"
             placeholder="Ej: Arroz, Jabón"
             autocomplete="off"
+            enterkeyhint="search"
           />
         </mat-form-field>
 
@@ -79,18 +81,19 @@ export type AgregarProductoCompraResultado =
     }
     .resultados {
       list-style: none;
-      margin: 0 0 8px;
+      margin: 0;
       padding: 0;
-      max-height: 240px;
-      overflow-y: auto;
+      overflow: hidden;
       border: var(--km-border);
       border-radius: 6px;
     }
     .resultado {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+      box-sizing: border-box;
       width: 100%;
       margin: 0;
       padding: 12px 14px;
@@ -112,13 +115,25 @@ export type AgregarProductoCompraResultado =
     .resultado-nombre {
       font-weight: 600;
     }
+    .resultado-nombre {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .resultado-cat {
+      flex-shrink: 0;
+      max-width: 45%;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     .resultado-cat,
     .sin-resultados {
       font-size: 0.8rem;
       color: var(--km-text-secondary);
     }
     .sin-resultados {
-      margin: 0 0 8px;
+      margin: 0;
     }
   `],
 })

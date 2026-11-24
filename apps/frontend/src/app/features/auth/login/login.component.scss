@@ -1,9 +1,11 @@
 .login-page {
+  box-sizing: border-box;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px));
   background: var(--km-bg-canvas);
   position: relative;
 }
