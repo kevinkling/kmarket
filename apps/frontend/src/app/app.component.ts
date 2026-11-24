@@ -5,6 +5,7 @@ import { filter, map, startWith } from 'rxjs';
 import { HeaderComponent } from './core/components/header/header.component';
 import { BottomNavComponent } from './core/components/bottom-nav/bottom-nav.component';
 import { ThemeService } from './core/services/theme.service';
+import { KeyboardInsetService } from './core/services/keyboard-inset.service';
 
 @Component({
   selector: 'app-root',
@@ -52,11 +53,18 @@ import { ThemeService } from './core/services/theme.service';
     .app-main--chrome {
       padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
     }
+    :host-context(.km-keyboard-open) .app-main--chrome {
+      padding-bottom: 16px;
+    }
   `],
 })
 export class AppComponent {
   private router = inject(Router);
   private theme = inject(ThemeService);
+
+  constructor() {
+    inject(KeyboardInsetService).start();
+  }
 
   readonly hideChrome = toSignal(
     this.router.events.pipe(

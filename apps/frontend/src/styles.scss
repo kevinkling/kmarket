@@ -352,17 +352,49 @@ html:active-view-transition .fade-in {
 }
 
 .mat-bottom-sheet-container {
+  box-sizing: border-box;
   border-top-left-radius: var(--km-radius-lg) !important;
   border-top-right-radius: var(--km-radius-lg) !important;
   background-color: var(--km-bg-surface) !important;
   border: var(--km-border) !important;
+  border-bottom: 0 !important;
   box-shadow: 0 -4px 20px var(--km-overlay) !important;
-  padding: 24px 20px !important;
+  /* El padding inferior lo pone la barra de acciones (sticky). */
+  padding: 12px 20px 0 !important;
   color: var(--km-text-primary) !important;
+  /* Sube por encima del teclado en iOS (en Android el viewport ya se achica). */
+  margin-bottom: var(--km-kb-inset, 0px) !important;
+  max-height: calc(min(88vh, var(--km-vv-height, 100dvh)) - 12px - env(safe-area-inset-top, 0px)) !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  transition: margin-bottom 0.2s ease;
+
+  /* Manija visual del sheet */
+  &::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    margin: 0 auto 14px;
+    border-radius: var(--km-radius-pill);
+    background: var(--km-border-color);
+  }
 }
 
-.mat-bottom-sheet-container.km-producto-sheet {
-  overflow: visible !important;
+/* Evita el zoom automático de iOS al enfocar campos (< 16px). */
+input,
+textarea,
+select,
+.mat-mdc-input-element,
+.mat-mdc-select {
+  font-size: 16px !important;
+}
+
+/* Con el teclado abierto, la navegación fija solo roba espacio. */
+html.km-keyboard-open app-bottom-nav,
+html.km-keyboard-open .wizard-footer {
+  display: none;
 }
 
 .km-badge {
@@ -492,9 +524,18 @@ html:active-view-transition .fade-in {
 }
 
 .km-sheet-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
   display: flex;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 8px;
+  padding: 16px 0 calc(16px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom, transparent, var(--km-bg-surface) 14px);
+}
+
+html.km-keyboard-open .km-sheet-actions {
+  padding-bottom: 12px;
 }
 
 .km-toggle-row {
@@ -584,4 +625,11 @@ html:active-view-transition .fade-in {
   margin: 0;
   color: var(--km-text-secondary);
   font-size: 0.95rem;
+}
+
+/* La "x" nativa de los campos de búsqueda sale azul y desalineada en WebKit. */
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
 }

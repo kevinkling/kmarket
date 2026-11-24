@@ -116,7 +116,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
                 (click)="comenzarRecorrido()"
               >
                 Comenzar recorrido
-                <mat-icon>arrow_forward</mat-icon>
+                <mat-icon iconPositionEnd>arrow_forward</mat-icon>
               </button>
               <button
                 mat-stroked-button
@@ -257,7 +257,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
               (click)="siguienteCategoria()"
             >
               {{ esUltimaCategoria ? 'Ver revisión (' + totalSeleccionados + ')' : 'Siguiente' }}
-              <mat-icon>chevron_right</mat-icon>
+              <mat-icon iconPositionEnd>chevron_right</mat-icon>
             </button>
           </ng-container>
 
@@ -292,6 +292,7 @@ export type ModoVista = 'resumen' | 'recorrido' | 'revision';
   styles: [`
     .preparar-wrapper {
       min-height: 100vh;
+      min-height: 100dvh;
       background-color: var(--km-bg-canvas);
       display: flex;
       flex-direction: column;
