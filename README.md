@@ -17,7 +17,7 @@ PWA offline-first para administrar la despensa y preparar la compra mensual, con
 | Rol | Dónde se usa | Email | Contraseña |
 | --- | --- | --- | --- |
 | Superusuario | Admin de PocketBase (`http://localhost:8090/_/`) | `admin@kmarket.local` | `kmarket123` |
-| Familia | PWA (`http://localhost:4200/` o GitHub Pages) | `kevin@kmarket.com` | `kmarket123` |
+| Familia | PWA (`http://localhost:4200/` o Cloudflare) | `kevin@kmarket.com` | `kmarket123` |
 
 El superusuario **no** entra en la PWA. La PWA usa cuentas de Collections → users.
 
@@ -80,14 +80,21 @@ Es offline-first: PocketBase es la fuente compartida entre dispositivos, no un r
 
 ## Deploy
 
-El frontend en GitHub Pages es HTTPS (`https://kevinkling.github.io/kmarket/`). El backend en tu PC, en crudo, es HTTP en `localhost:8090`. Eso **no alcanza** para la PWA publicada:
+El frontend en Cloudflare es HTTPS. El backend en tu PC, en crudo, es HTTP en `localhost:8090`. Eso **no alcanza** para la PWA publicada:
 
 - `localhost` en el celular es el celular, no tu PC.
 - Una página HTTPS no puede llamar a una API HTTP (mixed content).
 
-### Frontend (igual que ahora)
+### Frontend (Cloudflare)
 
-Push a `main` publica GitHub Pages. Antes, poné la URL **HTTPS** pública de PocketBase en [apps/frontend/src/environments/environment.prod.ts](apps/frontend/src/environments/environment.prod.ts):
+Cloudflare Workers & Pages → Create → Connect to Git, repo `kmarket`:
+
+- Rama de producción: `main`
+- Build command: `pnpm install --frozen-lockfile && pnpm build:frontend`
+- Deploy command: `npx wrangler deploy` (usa [`wrangler.jsonc`](wrangler.jsonc), que publica `apps/frontend/dist/kmarket/browser`)
+- Variable `NODE_VERSION` = `22`
+
+Cada push a `main` despliega solo. `wrangler.jsonc` activa `single-page-application`, así que las rutas del router devuelven `index.html`. Antes, poné la URL **HTTPS** pública de PocketBase en [apps/frontend/src/environments/environment.prod.ts](apps/frontend/src/environments/environment.prod.ts):
 
 ```ts
 export const environment = {
@@ -107,7 +114,7 @@ Si apagás la PC o Docker, el resto de la familia sigue usando **lo último que 
 
 ### Si no querés exponer el backend a internet
 
-Opciones: Tailscale (solo tus dispositivos), o usar la PWA solo en local (`pnpm dev:frontend` + Docker). GitHub Pages no va a poder hablar con `localhost`.
+Opciones: Tailscale (solo tus dispositivos), o usar la PWA solo en local (`pnpm dev:frontend` + Docker). La PWA publicada no va a poder hablar con `localhost`.
 
 ## Más detalle
 

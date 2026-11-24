@@ -30,7 +30,7 @@ Se usa en el teléfono (PWA) frente a la despensa o en el súper. Dexie guarda p
 - El modo local funciona sin cuenta. El login sincroniza cuando hay backend y sesión.
 - Una familia, no un SaaS multi-tenant. Multi-usuario familiar queda abierto: hoy opera una sola persona.
 - Copy existente en voseo argentino; no se pidió como compromiso de marca en este init.
-- Stack ya resuelto: Angular 19 PWA + Dexie; PocketBase en Docker. Frontend en GitHub Pages; backend en casa con HTTPS si se publica.
+- Stack ya resuelto: Angular 19 PWA + Dexie; PocketBase en Docker. Frontend en Cloudflare; backend en casa con HTTPS si se publica.
 
 ## Brand Commitments
 

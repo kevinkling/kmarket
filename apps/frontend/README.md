@@ -19,16 +19,14 @@ Login de la PWA: `kevin@kmarket.com` / `kmarket123`
 
 El backend hace falta para sincronizar, no para usar la despensa en este dispositivo. PocketBase local: http://localhost:8090 (ver el README raíz).
 
-## Deploy (GitHub Pages)
+## Deploy (Cloudflare)
 
-El push a `main` dispara el workflow y publica en:
+El push a `main` lo construye y publica Cloudflare (ver el README raíz).
 
-**https://kevinkling.github.io/kmarket/**
-
-Antes del build de producción, `apiUrl` en `src/environments/environment.prod.ts` tiene que ser la URL **HTTPS** pública de PocketBase. GitHub Pages no puede usar `http://localhost:8090`.
+Antes del build de producción, `apiUrl` en `src/environments/environment.prod.ts` tiene que ser la URL **HTTPS** pública de PocketBase. La PWA publicada no puede usar `http://localhost:8090`.
 
 Build manual:
 
 ```bash
-pnpm --filter frontend run build:gh-pages
+pnpm --filter frontend run build
 ```

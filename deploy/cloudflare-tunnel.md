@@ -15,7 +15,7 @@ Sin dominio. La URL cambia cada vez que reiniciás el túnel.
 cloudflared tunnel --url http://localhost:8090
 ```
 
-3. Copiá la URL `https://….trycloudflare.com` a `apps/frontend/src/environments/environment.prod.ts` (`apiUrl`) y volvé a publicar GitHub Pages.
+3. Copiá la URL `https://….trycloudflare.com` a `apps/frontend/src/environments/environment.prod.ts` (`apiUrl`) y hacé push a `main` para que Cloudflare republique la PWA.
 
 Sirve para probar el celular. No lo uses como setup definitivo.
 
@@ -50,8 +50,8 @@ Para que arranque con Windows: `cloudflared service install`.
 Después:
 
 1. `apiUrl: 'https://pb.tudominio.com'` en `environment.prod.ts`
-2. Push a `main` (GitHub Pages)
-3. En PocketBase Admin → Settings → Application, si hay “URL” o CORS, dejá el origen de la PWA (`https://kevinkling.github.io`)
+2. Push a `main` (Cloudflare republica la PWA)
+3. En PocketBase Admin → Settings → Application, si hay “URL” o CORS, dejá el origen de la PWA (su URL de `*.workers.dev`)
 
 PocketBase suele permitir cualquier origen; si el login falla por CORS, revisá eso.
 
